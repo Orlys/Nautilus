@@ -8,7 +8,7 @@
 
     using Action = Enums.Action;
 
-    public interface IRule
+    public interface IRule : IDisposable
     {
         string Grouping { get; }
         Action Action { get; set; }
@@ -27,7 +27,6 @@
 
     public interface IAdvanceRule : IRule
     {
-        new string Grouping { get; set; }
         string IcmpTypesAndCodes { get; set; }
         string ApplicationName { get; set; }
         InterfaceTypes InterfaceTypes { get; set; }

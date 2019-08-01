@@ -68,12 +68,7 @@ namespace Orlys.Firewall.Models
             for (int i = 0; i < rangeString.Length; i++)
             {
                 var c = rangeString[i];
-                if(c == '*')
-                {
-                    range = All;
-                    return true;
-                }
-                else if (c >= '0' && c <= '9')
+                if (c >= '0' && c <= '9')
                 {
                     to = to * 10 + (c - '0');
                 }
@@ -109,7 +104,6 @@ namespace Orlys.Firewall.Models
             return true;
         }
 
-        public readonly static PortRange All = new PortRange(0, 65535);
 
         public static PortRange Parse(string rangeString)
         {
@@ -120,11 +114,7 @@ namespace Orlys.Firewall.Models
             for (int i = 0; i < rangeString.Length; i++)
             {
                 var c = rangeString[i];
-                if (c == '*')
-                {
-                    return All;
-                }
-                else if (c >= '0' && c <= '9')
+                if (c >= '0' && c <= '9')
                 {
                     to = to * 10 + (c - '0');
                 }

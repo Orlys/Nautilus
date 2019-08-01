@@ -74,8 +74,15 @@ namespace Orlys.Firewall.Collections
             for (int i = 0; i < split.Length; i++)
             {
                 var segment = split[i];
-                var item = s_parse.Invoke(segment);
-                sep.Add(item, false);
+                try
+                {
+                    var item = s_parse.Invoke(segment);
+                    sep.Add(item, false);
+                }
+                catch
+                {
+
+                }
             }
             sep.Notify();
 

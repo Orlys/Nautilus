@@ -6,17 +6,20 @@ namespace Orlys.Firewall
     using NetFwTypeLib;
     using Orlys.Firewall.Internal;
     using System.Collections;
-    using Orlys.Firewall.Collections; 
+    using Orlys.Firewall.Collections;
     using Orlys.Firewall.Enums;
-    using Guid = System.Guid; 
+    using Guid = System.Guid;
     using NotSupported = System.NotSupportedException;
     using Orlys.Firewall.Models;
+    using System;
+    using Action = Enums.Action;
 
     /// <summary>
     /// 規則物件
     /// </summary>
-    public sealed class Rule : IRule, IAdvanceRule
+    public sealed class Rule : IRule, IAdvanceRule, IDisposable
     {
+        private readonly Func<string, bool> _removeDelegate;
         private readonly INetFwRule _r;
 
         /// <summary>
@@ -24,16 +27,17 @@ namespace Orlys.Firewall
         /// </summary>
         public Guid Id { get; }
 
-        internal Rule(System.Action<string> removeDelegate, INetFwRule rule, Guid? id = null)
+        internal Rule(System.Func<string, bool> removeDelegate, INetFwRule rule, Guid? id = null)
         {
             this.Id = id ?? Guid.NewGuid();
+            this._removeDelegate = removeDelegate;
             this._r = rule;
             this.Enabled = true;
 
-            this.RemotePorts = SeparatedList<PortRange>.Parse(_r.RemotePorts, onStringUpdated: x => _r.RemotePorts = x);
-            this.LocalPorts = SeparatedList<PortRange>.Parse(_r.LocalPorts, onStringUpdated: x => _r.LocalPorts = x);
-            this.LocalAddresses = SeparatedList<IPAddressRange>.Parse(_r.LocalAddresses, onStringUpdated: x => _r.LocalAddresses = x);
-            this.RemoteAddresses = SeparatedList<IPAddressRange>.Parse(_r.RemoteAddresses, onStringUpdated: x => _r.RemoteAddresses = x);
+            this.RemotePorts = SeparatedList<PortRange>.Parse(this._r.RemotePorts, onStringUpdated: x => this._r.RemotePorts = x);
+            this.LocalPorts = SeparatedList<PortRange>.Parse(this._r.LocalPorts, onStringUpdated: x => this._r.LocalPorts = x);
+            this.LocalAddresses = SeparatedList<IPAddressRange>.Parse(this._r.LocalAddresses, onStringUpdated: x => this._r.LocalAddresses = x);
+            this.RemoteAddresses = SeparatedList<IPAddressRange>.Parse(this._r.RemoteAddresses, onStringUpdated: x => this._r.RemoteAddresses = x);
         }
 
         /// <summary>
@@ -79,7 +83,6 @@ namespace Orlys.Firewall
         /// 啟用狀態
         /// </summary>
         public bool Enabled { get => _r.Enabled; set => _r.Enabled = value; }
-
 
         /// <summary>
         /// 規則名稱
@@ -150,15 +153,12 @@ namespace Orlys.Firewall
         /// 群組
         /// </summary>
         public string Grouping => _r.Grouping;
+         
 
         /// <summary>
-        /// 群組
+        /// 刪除
         /// </summary>
-        string IAdvanceRule.Grouping
-        {
-            get => _r.Grouping;
-            set => _r.Grouping = value;
-        }
+        public void Dispose() => this._removeDelegate.Invoke(this.Name);
 
         #endregion
     }

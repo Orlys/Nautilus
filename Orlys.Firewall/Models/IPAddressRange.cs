@@ -138,10 +138,14 @@ namespace Orlys.Firewall.Models
 
         public static IPAddressRange Parse(string ipRangeString)
         {
-            if (ipRangeString == null) throw new ArgumentNullException(nameof(ipRangeString));
+            if (ipRangeString == null)
+                throw new ArgumentNullException(nameof(ipRangeString));
 
             // trim white spaces.
             ipRangeString = ipRangeString.Trim();
+
+            if (ipRangeString == "*")
+                throw new FormatException(nameof(ipRangeString));
 
             // define local funtion to strip scope id in ip address string.
             string stripScopeId(string ipaddressString) => ipaddressString.Split('%')[0];
@@ -195,24 +199,81 @@ namespace Orlys.Firewall.Models
                 return new IPAddressRange(new IPAddress(baseAdrBytes), new IPAddress(Bits.Or(baseAdrBytes, Bits.Not(maskBytes))));
             }
 
-            if (ipRangeString == "*" || ipRangeString == "LocalSubnet")
-                return All;
 
             throw new FormatException("Unknown IP range string.");
         }
 
         public static bool TryParse(string ipRangeString, out IPAddressRange ipRange)
         {
-            try
+            ipRange = null;
+            if (ipRangeString == null)
+                return false;
+
+            // trim white spaces.
+            ipRangeString = ipRangeString.Trim();
+
+            if (ipRangeString == "*")
+                return false;
+
+            // define local funtion to strip scope id in ip address string.
+            string stripScopeId(string ipaddressString) => ipaddressString.Split('%')[0];
+
+            // Pattern 1. CIDR range: "192.168.0.0/24", "fe80::/10%eth0"
+            var m1 = m1_regex.Match(ipRangeString);
+            if (m1.Success)
             {
-                ipRange = IPAddressRange.Parse(ipRangeString);
+                var baseAdrBytes = IPAddress.Parse(stripScopeId(m1.Groups["adr"].Value)).GetAddressBytes();
+                var maskLen = int.Parse(m1.Groups["maskLen"].Value);
+                if (baseAdrBytes.Length * 8 < maskLen)
+                    return false;
+                var maskBytes = Bits.GetBitMask(baseAdrBytes.Length, maskLen);
+                baseAdrBytes = Bits.And(baseAdrBytes, maskBytes);
+                ipRange = new IPAddressRange(new IPAddress(baseAdrBytes), new IPAddress(Bits.Or(baseAdrBytes, Bits.Not(maskBytes))));
                 return true;
             }
-            catch (Exception)
+
+            // Pattern 2. Uni address: "127.0.0.1", ":;1"
+            var m2 = m2_regex.Match(ipRangeString);
+            if (m2.Success)
             {
-                ipRange = null;
-                return false;
+                ipRange = new IPAddressRange(IPAddress.Parse(stripScopeId(ipRangeString)));
+                return true;
             }
+
+            // Pattern 3. Begin end range: "169.254.0.0-169.254.0.255"
+            var m3 = m3_regex.Match(ipRangeString);
+            if (m3.Success)
+            {
+                // if the left part contains dot, but the right one does not, we treat it as a shortuct notation
+                // and simply copy the part before last dot from the left part as the prefix to the right one
+                var begin = m3.Groups["begin"].Value;
+                var end = m3.Groups["end"].Value;
+                if (begin.Contains('.') && !end.Contains('.'))
+                {
+                    if (end.Contains('%'))
+                        return false;
+                    var lastDotAt = begin.LastIndexOf('.');
+                    end = begin.Substring(0, lastDotAt + 1) + end;
+                }
+
+                ipRange = new IPAddressRange(
+                    begin: IPAddress.Parse(stripScopeId(begin)),
+                    end: IPAddress.Parse(stripScopeId(end)));
+                return true;
+            }
+
+            // Pattern 4. Bit mask range: "192.168.0.0/255.255.255.0"
+            var m4 = m4_regex.Match(ipRangeString);
+            if (m4.Success)
+            {
+                var baseAdrBytes = IPAddress.Parse(stripScopeId(m4.Groups["adr"].Value)).GetAddressBytes();
+                var maskBytes = IPAddress.Parse(m4.Groups["bitmask"].Value).GetAddressBytes();
+                baseAdrBytes = Bits.And(baseAdrBytes, maskBytes);
+                ipRange = new IPAddressRange(new IPAddress(baseAdrBytes), new IPAddress(Bits.Or(baseAdrBytes, Bits.Not(maskBytes))));
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
