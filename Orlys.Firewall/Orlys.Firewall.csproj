@@ -49,6 +49,7 @@
     <Compile Include="Rule.cs" />
     <Compile Include="Collections\SeparatedList`1.cs" />
     <Compile Include="Internal\TypeHelper.cs" />
+    <Compile Include="Extensions\RuleExtension.cs" />
     <Compile Include="RuleSet.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -20,7 +20,7 @@
         SeparatedList<PortRange> LocalPorts { get; }
         string Name { get; }
         Profiles Profiles { get; set; }
-        Protocol Protocol { get; set; }
+        RichProtocol Protocol { get; set; }
         SeparatedList<IPAddressRange> RemoteAddresses { get; }
         SeparatedList<PortRange> RemotePorts { get; }
     }

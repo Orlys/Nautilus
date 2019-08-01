@@ -71,5 +71,22 @@ namespace Orlys.Firewall
                 this.Remove(name);
             }
         }
+
+        public IEnumerable<IRule> GetList(Predicate<IRule> filter = null)
+        {
+            if (filter == null)
+                return this._rules.Values;
+
+            IEnumerable<IRule> iterator()
+            {
+                foreach (var rule in this._rules.Values)
+                {
+                    if (filter(rule))
+                        yield return rule;
+                }
+            }
+            return iterator();
+
+        }
     }
 }

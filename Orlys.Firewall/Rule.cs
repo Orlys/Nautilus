@@ -92,7 +92,7 @@ namespace Orlys.Firewall
         /// <summary>
         /// 通訊協定
         /// </summary>
-        public Protocol Protocol { get => _r.Protocol; set => _r.Protocol = value; }
+        public RichProtocol Protocol { get => _r.Protocol; set => _r.Protocol = value; }
 
         /// <summary>
         /// 描述

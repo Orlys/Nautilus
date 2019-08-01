@@ -16,8 +16,7 @@ namespace Orlys.Firewall.Dev
         {
             var rs = new RuleSet();
 
-            var rule = rs.AddOrGet("test");
-            rule.
+            var rule = rs.AddOrGet("test"); 
             
 
             rule.RemoteAddresses.Add(IPAddressRange.Parse("10.0.0.1-10.0.0.5"));
