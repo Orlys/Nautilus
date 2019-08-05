@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orlys.Firewall", "Orlys.Firewall\Orlys.Firewall.csproj", "{85DE8E96-186E-406A-B7C9-EA2B2A0AF17A}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orlys.Firewall.Dev", "src\Orlys.Firewall.Dev\Orlys.Firewall.Dev.csproj", "{2142B808-3F08-4E0A-8C5F-B626E016D51F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orlys.Firewall", "src\Orlys.Firewall\Orlys.Firewall.csproj", "{85DE8E96-186E-406A-B7C9-EA2B2A0AF17A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,14 +13,14 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{85DE8E96-186E-406A-B7C9-EA2B2A0AF17A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{85DE8E96-186E-406A-B7C9-EA2B2A0AF17A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{85DE8E96-186E-406A-B7C9-EA2B2A0AF17A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{85DE8E96-186E-406A-B7C9-EA2B2A0AF17A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2142B808-3F08-4E0A-8C5F-B626E016D51F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2142B808-3F08-4E0A-8C5F-B626E016D51F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2142B808-3F08-4E0A-8C5F-B626E016D51F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2142B808-3F08-4E0A-8C5F-B626E016D51F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85DE8E96-186E-406A-B7C9-EA2B2A0AF17A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85DE8E96-186E-406A-B7C9-EA2B2A0AF17A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85DE8E96-186E-406A-B7C9-EA2B2A0AF17A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85DE8E96-186E-406A-B7C9-EA2B2A0AF17A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
