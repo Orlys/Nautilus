@@ -1,15 +1,21 @@
 ﻿
 namespace Orlys.Firewall.Collections
 {
+    using Orlys.Firewall.Internal.Visualizers;
     using System;
     using System.Collections;
-    using System.Collections.Generic; 
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
-
-    public class SeparatedList<T> : IReadOnlyCollection<T>
-        where T : IEquatable<T>
+     
+    [DebuggerDisplay("{_debugString}")]
+    [DebuggerTypeProxy(typeof(InternalListVisualizer<>))]
+    public class SeparatedList<T> : IReadOnlyCollection<T> where T : IEquatable<T>
     {
+        private string _debugString => this.ToString();
+
         public class HydraBuilder
         {
             protected readonly string[] Separator;
@@ -37,13 +43,24 @@ namespace Orlys.Firewall.Collections
 
         public event Action<string> OnStringUpdated;
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public static readonly HydraBuilder DefaultSeparator = new HydraBuilder(",");
 
         private delegate T ParseDelegate(string str);
-        private static ParseDelegate s_parse;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private static ParseDelegate s_parse; 
+          
+        internal static readonly string Default;
+
+        static SeparatedList()
+        {
+            var defaultValue = typeof(T).GetCustomAttribute<DefaultValueAttribute>();
+            Default = defaultValue?.Value?.ToString();
+        }
 
         public static SeparatedList<T> Parse(string str, HydraBuilder hydra = null, Action<string> onStringUpdated = null)
         {
+
             if (s_parse == null)
             {
                 var type = typeof(T);
@@ -64,43 +81,51 @@ namespace Orlys.Firewall.Collections
                 s_parse = lambda.Compile();
             }
             hydra = hydra ?? DefaultSeparator;
+
+
             var sep = new SeparatedList<T>(hydra);
             if (onStringUpdated != null)
                 sep.OnStringUpdated += onStringUpdated;
 
-            var split = hydra.Split(str);
-            if (split == null)
-                return sep;
-            for (int i = 0; i < split.Length; i++)
+            if (!(string.IsNullOrWhiteSpace(str) || string.Equals(str.Trim(), Default)))
             {
-                var segment = split[i];
-                try
+                var split = hydra.Split(str);
+                if (split == null)
+                    return sep;
+                for (int i = 0; i < split.Length; i++)
                 {
-                    var item = s_parse.Invoke(segment);
-                    sep.Add(item, false);
-                }
-                catch
-                {
+                    var segment = split[i];
+                    try
+                    {
+                        var item = s_parse.Invoke(segment);
+                        sep.Add(item, false);
+                    }
+                    catch
+                    {
 
+                    }
                 }
             }
-            sep.Notify();
 
+            sep.Notify();
             return sep;
         }
 
-        private readonly HashSet<T> _list;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal readonly HashSet<T> InternalList;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Func<IEnumerable<T>, string> _joinHandler;
 
-        public SeparatedList(HydraBuilder separator = null)
+        public SeparatedList(HydraBuilder hydra = null)
         {
-            this._list = new HashSet<T>();
-            this._joinHandler = (separator ?? DefaultSeparator).Join;
+            this.InternalList = new HashSet<T>();
+            this._joinHandler = (hydra ?? DefaultSeparator).Join;
         }
 
         public bool Add(T item, bool raise = true)
         {
-            var a = this._list.Add(item);
+            var a = this.InternalList.Add(item);
             if (a && raise)
                 this.Notify();
             return a;
@@ -111,7 +136,7 @@ namespace Orlys.Firewall.Collections
             var f = false;
             foreach (var item in items)
             {
-                f |= this._list.Add(item);
+                f |= this.InternalList.Add(item);
             }
             if (f && raise)
                 this.Notify();
@@ -120,12 +145,12 @@ namespace Orlys.Firewall.Collections
 
         public bool Contains(T item)
         {
-            return this._list.Contains(item);
+            return this.InternalList.Contains(item);
         }
 
         public bool Remove(T item, bool raise = false)
         {
-            var r = this._list.Remove(item);
+            var r = this.InternalList.Remove(item);
             if (r && raise)
                 this.Notify();
             return r;
@@ -133,21 +158,25 @@ namespace Orlys.Firewall.Collections
 
         public void Clear(bool raise = false)
         {
-            this._list.Clear();
+            this.InternalList.Clear();
             if (raise)
                 this.Notify();
         }
 
         public override string ToString()
         {
-            return this._joinHandler.Invoke(this._list);
+            if (this.Count == 0)
+                return Default;
+
+            return this._joinHandler.Invoke(this.InternalList);
         }
 
-        public int Count => this._list.Count;
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public int Count => this.InternalList.Count;
 
         public IEnumerator<T> GetEnumerator()
         {
-            var e = this._list.GetEnumerator();
+            var e = this.InternalList.GetEnumerator();
             switch (this.Count)
             {
                 case 0:
@@ -187,7 +216,7 @@ namespace Orlys.Firewall.Collections
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         public void Notify()
-        {
+        { 
             this.OnStringUpdated?.Invoke(this.ToString());
         }
     }

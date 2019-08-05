@@ -4,8 +4,7 @@ namespace Orlys.Firewall
 
 
     using NetFwTypeLib;
-    using Orlys.Firewall.Internal;
-    using System.Collections;
+    using Orlys.Firewall.Internal; 
     using Orlys.Firewall.Collections;
     using Orlys.Firewall.Enums;
     using Guid = System.Guid;
@@ -13,13 +12,18 @@ namespace Orlys.Firewall
     using Orlys.Firewall.Models;
     using System;
     using Action = Enums.Action;
+    using System.Diagnostics;
 
     /// <summary>
     /// 規則物件
     /// </summary>
+    [DebuggerDisplay("{Name}")]
     public sealed class Rule : IRule, IAdvanceRule, IDisposable
     {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Func<string, bool> _removeDelegate;
+
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly INetFwRule _r;
 
         /// <summary>
@@ -34,21 +38,29 @@ namespace Orlys.Firewall
             this._r = rule;
             this.Enabled = true;
 
-            this.RemotePorts = SeparatedList<PortRange>.Parse(this._r.RemotePorts, onStringUpdated: x => this._r.RemotePorts = x);
-            this.LocalPorts = SeparatedList<PortRange>.Parse(this._r.LocalPorts, onStringUpdated: x => this._r.LocalPorts = x);
+            this.RemotePorts = SeparatedList<RemotePortRange>.Parse(this._r.RemotePorts, onStringUpdated: x =>
+            {
+                if (x != null)
+                    this._r.RemotePorts = x;
+            });
+            this.LocalPorts = SeparatedList<LocalPortRange>.Parse(this._r.LocalPorts, onStringUpdated: x =>
+            {
+                if (x != null)
+                    this._r.LocalPorts = x;
+            });
             this.LocalAddresses = SeparatedList<IPAddressRange>.Parse(this._r.LocalAddresses, onStringUpdated: x => this._r.LocalAddresses = x);
             this.RemoteAddresses = SeparatedList<IPAddressRange>.Parse(this._r.RemoteAddresses, onStringUpdated: x => this._r.RemoteAddresses = x);
         }
 
         /// <summary>
         /// 遠端連接埠
-        /// </summary>
-        public SeparatedList<PortRange> RemotePorts { get; }
+        /// </summary> 
+        public SeparatedList<RemotePortRange> RemotePorts { get; }
 
         /// <summary>
         /// 本地連接埠
-        /// </summary>
-        public SeparatedList<PortRange> LocalPorts { get; }
+        /// </summary> 
+        public SeparatedList<LocalPortRange> LocalPorts { get; }
 
         /// <summary>
         /// 本地位置
@@ -57,7 +69,7 @@ namespace Orlys.Firewall
 
         /// <summary>
         /// 遠端位置
-        /// </summary>
+        /// </summary> 
         public SeparatedList<IPAddressRange> RemoteAddresses { get; }
 
         #region Properties
@@ -87,6 +99,7 @@ namespace Orlys.Firewall
         /// <summary>
         /// 規則名稱
         /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string Name => _r.Name;
 
         /// <summary>
@@ -152,6 +165,7 @@ namespace Orlys.Firewall
         /// <summary>
         /// 群組
         /// </summary>
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string Grouping => _r.Grouping;
          
 

@@ -2,30 +2,42 @@
 namespace Orlys.Firewall.Models
 {
     using Orlys.Firewall.Collections;
+    using Orlys.Firewall.Internal.Visualizers;
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics;
 
-    public sealed class PortRange : IFixedRange<ushort> , IEquatable<PortRange>
-    { 
+    [DefaultValue(null)]
+    [DebuggerTypeProxy(typeof(InternalRangeTypeVisualizer))]
+    public sealed class RemotePortRange : IFixedRange<ushort>, IEquatable<RemotePortRange>
+    {
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public ushort Begin { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public ushort End { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly bool _isSinglePort;
 
-        public PortRange(ushort first, ushort second)
+
+        public RemotePortRange(ushort first, ushort second)
         {
             if (first > second)
             {
-                first ^= second ^= first ^= second;
+                this.Begin = second;
+                this.End = first;
             }
-
-            this.Begin = first;
-            this.End = second;
+            else
+            {
+                this.Begin = first;
+                this.End = second;
+            }
             this._isSinglePort = this.Begin == this.End;
         }
 
-        public PortRange(ushort singlePort) : this(singlePort, singlePort)
+        public RemotePortRange(ushort singlePort) : this(singlePort, singlePort)
         {
         }
 
@@ -38,7 +50,7 @@ namespace Orlys.Firewall.Models
             return this.Begin <= port && this.End >= port;
         }
 
-        public bool Contains(PortRange range)
+        public bool Contains(RemotePortRange range)
         {
             if (range._isSinglePort)
             {
@@ -49,20 +61,20 @@ namespace Orlys.Firewall.Models
 
         public override string ToString()
         {
+
             if (this._isSinglePort)
                 return this.Begin.ToString();
 
-            if (this.Begin == 0 && this.End == 65535)
-                return "*";
             return string.Format("{0}-{1}", this.Begin, this.End);
         }
 
-        public static bool TryParse(string rangeString, out PortRange range)
+
+        public static bool TryParse(string rangeString, out RemotePortRange range)
         {
             range = null;
             if (string.IsNullOrWhiteSpace(rangeString))
                 return false;
-             
+
             var from = -1;
             var to = default(int);
             for (int i = 0; i < rangeString.Length; i++)
@@ -80,7 +92,9 @@ namespace Orlys.Firewall.Models
                 else if (char.IsWhiteSpace(c))
                     continue;
                 else
+                {
                     return false;
+                }
             }
 
             if (from == -1)
@@ -88,7 +102,7 @@ namespace Orlys.Firewall.Models
                 if (to > ushort.MaxValue || to < ushort.MinValue)
                     return false;
 
-                range = new PortRange((ushort)to);
+                range = new RemotePortRange((ushort)to);
             }
             else
             {
@@ -99,13 +113,13 @@ namespace Orlys.Firewall.Models
 
                 if (from > to)
                     from ^= to ^= from ^= to;
-                range = new PortRange((ushort)from, (ushort)to);
+                range = new RemotePortRange((ushort)from, (ushort)to);
             }
             return true;
         }
 
 
-        public static PortRange Parse(string rangeString)
+        public static RemotePortRange Parse(string rangeString)
         {
             if (string.IsNullOrWhiteSpace(rangeString))
                 throw new ArgumentNullException(nameof(rangeString));
@@ -126,16 +140,18 @@ namespace Orlys.Firewall.Models
                 else if (char.IsWhiteSpace(c))
                     continue;
                 else
+                {
                     throw new FormatException($"Format error: '{rangeString}'");
+                }
             }
 
-            var range = default(PortRange);
+            var range = default(RemotePortRange);
             if (from == -1)
             {
                 if (to > ushort.MaxValue || to < ushort.MinValue)
                     throw new ArgumentOutOfRangeException("single");
 
-                range = new PortRange((ushort)to);
+                range = new RemotePortRange((ushort)to);
             }
             else
             {
@@ -145,9 +161,9 @@ namespace Orlys.Firewall.Models
                     throw new ArgumentOutOfRangeException("sencond");
 
                 if (from > to)
-                    range = new PortRange((ushort)to, (ushort)from);
+                    range = new RemotePortRange((ushort)to, (ushort)from);
                 else
-                    range = new PortRange((ushort)from, (ushort)to);
+                    range = new RemotePortRange((ushort)from, (ushort)to);
             }
             return range;
         }
@@ -164,12 +180,6 @@ namespace Orlys.Firewall.Models
                 yield return i;
             yield return this.End;
         }
-
-        public static implicit operator PortRange(ushort port)
-        {
-            return new PortRange(port);
-        }
-
         public override int GetHashCode()
         {
             return this.ToString().GetHashCode();
@@ -177,16 +187,33 @@ namespace Orlys.Firewall.Models
 
         public override bool Equals(object obj)
         {
-            if (obj is PortRange fp)
+            if (obj is RemotePortRange fp)
             {
                 return this.Equals(fp);
             }
             return false;
         }
 
-        public bool Equals(PortRange range)
+        public bool Equals(RemotePortRange range)
         {
             return this.GetHashCode() == range.GetHashCode();
+        }
+
+        public static explicit operator RemotePortRange(string str)
+        {
+            if (TryParse(str, out var v))
+                return v;
+            throw new FormatException();
+        }
+
+        public static implicit operator RemotePortRange(ushort port)
+        {
+            return new RemotePortRange(port);
+        }
+
+        public static implicit operator LocalPortRange(RemotePortRange range)
+        { 
+            return new LocalPortRange(range.Begin, range.End);
         }
     }
 } 

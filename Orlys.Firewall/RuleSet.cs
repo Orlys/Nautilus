@@ -3,16 +3,21 @@ namespace Orlys.Firewall
 {
     using NetFwTypeLib;
     using Orlys.Firewall.Internal;
+    using Orlys.Firewall.Internal.Visualizers;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Reflection;
 
+    [DebuggerTypeProxy(typeof(InternalRuleSetVisualizer))] 
     public class RuleSet
     {
-        private readonly static string s_product = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyProductAttribute>().Product;
+        internal readonly static string Grouping = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyProductAttribute>().Product;
 
-        private readonly Dictionary<string, IRule> _rules = new Dictionary<string, IRule>();
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        internal readonly Dictionary<string, IRule> InternalList = new Dictionary<string, IRule>();
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly INetFwPolicy2 _policy;
 
         public RuleSet()
@@ -20,10 +25,10 @@ namespace Orlys.Firewall
             this._policy = FwTypes.CreatePolicy2();
             foreach (INetFwRule rule in this._policy.Rules)
             {
-                if (string.Equals(rule.Grouping, s_product, StringComparison.InvariantCultureIgnoreCase))
+                if (string.Equals(rule.Grouping, Grouping, StringComparison.InvariantCultureIgnoreCase))
                 {
                     var r = new Rule(this.Remove, rule, null);
-                    this._rules.Add(r.Name, r);
+                    this.InternalList.Add(r.Name, r);
                 }
             }
         }
@@ -38,11 +43,11 @@ namespace Orlys.Firewall
         {
             this.IsNullOrEmpty(name);
 
-            if (!this._rules.TryGetValue(name, out var rule))
+            if (!this.InternalList.TryGetValue(name, out var rule))
             {
                 var r = FwTypes.CreateRule();
                 r.Name = name;
-                r.Grouping = s_product;
+                r.Grouping = Grouping;
                 this._policy.Rules.Add(r);
 
                 r = this._policy.Rules.Item(name);
@@ -55,7 +60,7 @@ namespace Orlys.Firewall
         {
             this.IsNullOrEmpty(name);
 
-            if (this._rules.Remove(name))
+            if (this.InternalList.Remove(name))
             {
                 this._policy.Rules.Remove(name);
                 return true;
@@ -65,7 +70,7 @@ namespace Orlys.Firewall
 
         public void Clear()
         {
-            var names = this._rules.Keys;
+            var names = this.InternalList.Keys;
             foreach (var name in names)
             {
                 this.Remove(name);
@@ -75,11 +80,11 @@ namespace Orlys.Firewall
         public IEnumerable<IRule> GetList(Predicate<IRule> filter = null)
         {
             if (filter == null)
-                return this._rules.Values;
+                return this.InternalList.Values;
 
             IEnumerable<IRule> iterator()
             {
-                foreach (var rule in this._rules.Values)
+                foreach (var rule in this.InternalList.Values)
                 {
                     if (filter(rule))
                         yield return rule;

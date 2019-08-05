@@ -4,6 +4,12 @@ namespace Orlys.Firewall.Enums
     using System;
     using System.ComponentModel;
 
+    public enum Protocol
+    {
+        TCP = 6,
+        UDP = 17
+    }
+
     /// <summary>
     /// </summary>
     /// <see cref="https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xml"/>

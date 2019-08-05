@@ -1,35 +1,43 @@
-﻿
-namespace Orlys.Firewall.Models
+﻿namespace Orlys.Firewall.Models
 {
+    using Orlys.Firewall.Collections;
+    using Orlys.Firewall.Internal;
+    using Orlys.Firewall.Internal.Visualizers;
+
     using System;
-    using System.Linq;
     using System.Collections;
     using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Linq;
     using System.Net;
     using System.Text.RegularExpressions;
-    using System.ComponentModel;
-    using System.Net.Sockets;
-    using Orlys.Firewall.Internal;
-    using Orlys.Firewall.Collections;
 
-    public sealed class IPAddressRange : IEnumerable<IPAddress>  , IEquatable<IPAddressRange>, IFixedRange<IPAddress>
-
+    [DefaultValue("*")]
+    [DebuggerTypeProxy(typeof(InternalRangeTypeVisualizer))]
+    public sealed class IPAddressRange : IEnumerable<IPAddress>, IEquatable<IPAddressRange>, IFixedRange<IPAddress>
     {
         // Pattern 1. CIDR range: "192.168.0.0/24", "fe80::%lo0/10"
-        private static Regex m1_regex = new Regex(@"^(?<adr>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))[ \t]*/[ \t]*(?<maskLen>\d+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly static Regex m1_regex = new Regex(@"^(?<adr>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))[ \t]*/[ \t]*(?<maskLen>\d+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         // Pattern 2. Uni address: "127.0.0.1", "::1%eth0"
-        private static Regex m2_regex = new Regex(@"^(?<adr>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly static Regex m2_regex = new Regex(@"^(?<adr>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         // Pattern 3. Begin end range: "169.254.0.0-169.254.0.255", "fe80::1%23-fe80::ff%23"
         //            also shortcut notation: "192.168.1.1-7" (IPv4 only)
-        private static Regex m3_regex = new Regex(@"^(?<begin>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))[ \t]*[\-–][ \t]*(?<end>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly static Regex m3_regex = new Regex(@"^(?<begin>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))[ \t]*[\-–][ \t]*(?<end>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         // Pattern 4. Bit mask range: "192.168.0.0/255.255.255.0"
-        private static Regex m4_regex = new Regex(@"^(?<adr>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))[ \t]*/[ \t]*(?<bitmask>[\da-f\.:]+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        private readonly static Regex m4_regex = new Regex(@"^(?<adr>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))[ \t]*/[ \t]*(?<bitmask>[\da-f\.:]+)$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        public IPAddress Begin { get;  }
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+        public IPAddress Begin { get; }
 
+        [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public IPAddress End { get; }
 
         /// <summary>
@@ -93,14 +101,6 @@ namespace Orlys.Firewall.Models
             End = new IPAddress(Bits.Or(baseAdrBytes, Bits.Not(maskBytes)));
         }
 
-        [EditorBrowsable(EditorBrowsableState.Never), Obsolete("Use IPAddressRange.Parse static method instead.")]
-        public IPAddressRange(string ipRangeString)
-        {
-            var parsed = Parse(ipRangeString);
-            Begin = parsed.Begin;
-            End = parsed.End;
-        }
-         
         public bool Contains(IPAddress ipaddress)
         {
             if (ipaddress == null)
@@ -111,7 +111,7 @@ namespace Orlys.Firewall.Models
             var offset = 0;
             if (Begin.IsIPv4MappedToIPv6 && ipaddress.IsIPv4MappedToIPv6)
             {
-                offset = 12; //ipv4 has prefix of 10 zero bytes and two 255 bytes. 
+                offset = 12; //ipv4 has prefix of 10 zero bytes and two 255 bytes.
             }
 
             var adrBytes = ipaddress.GetAddressBytes();
@@ -128,7 +128,7 @@ namespace Orlys.Firewall.Models
             var offset = 0;
             if (Begin.IsIPv4MappedToIPv6 && range.Begin.IsIPv4MappedToIPv6)
             {
-                offset = 12; //ipv4 has prefix of 10 zero bytes and two 255 bytes. 
+                offset = 12; //ipv4 has prefix of 10 zero bytes and two 255 bytes.
             }
 
             return
@@ -143,9 +143,6 @@ namespace Orlys.Firewall.Models
 
             // trim white spaces.
             ipRangeString = ipRangeString.Trim();
-
-            if (ipRangeString == "*")
-                throw new FormatException(nameof(ipRangeString));
 
             // define local funtion to strip scope id in ip address string.
             string stripScopeId(string ipaddressString) => ipaddressString.Split('%')[0];
@@ -199,7 +196,6 @@ namespace Orlys.Firewall.Models
                 return new IPAddressRange(new IPAddress(baseAdrBytes), new IPAddress(Bits.Or(baseAdrBytes, Bits.Not(maskBytes))));
             }
 
-
             throw new FormatException("Unknown IP range string.");
         }
 
@@ -211,9 +207,6 @@ namespace Orlys.Firewall.Models
 
             // trim white spaces.
             ipRangeString = ipRangeString.Trim();
-
-            if (ipRangeString == "*")
-                return false;
 
             // define local funtion to strip scope id in ip address string.
             string stripScopeId(string ipaddressString) => ipaddressString.Split('%')[0];
@@ -312,10 +305,8 @@ namespace Orlys.Firewall.Models
             return GetEnumerator();
         }
 
-        public readonly static IPAddressRange All = new IPAddressRange(IPAddress.Parse("::"), IPAddress.Parse("ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff"));
-
         /// <summary>
-        /// Returns the range in the format "begin-end", or 
+        /// Returns the range in the format "begin-end", or
         /// as a single address if End is the same as Begin.
         /// </summary>
         /// <returns></returns>
@@ -323,9 +314,6 @@ namespace Orlys.Firewall.Models
         {
             if (Equals(Begin, End))
                 return Begin.ToString();
-
-            if (Equals(Begin, All.Begin) && Equals(End, All.End))
-                return "*";
 
             return string.Format("{0}-{1}", Begin, End);
         }
@@ -371,6 +359,7 @@ namespace Orlys.Firewall.Models
                 ? this.GetHashCode() == range.GetHashCode()
                 : false;
         }
+
         public bool Equals(IPAddressRange other)
         {
             return this.GetHashCode() == other.GetHashCode();
@@ -384,6 +373,16 @@ namespace Orlys.Firewall.Models
             return string.Format("{0}/{1}", Begin, GetPrefixLength());
         }
 
+        public static implicit operator IPAddressRange(IPAddress address)
+        {
+            return new IPAddressRange(address);
+        }
 
+        public static explicit operator IPAddressRange(string str)
+        {
+            if (TryParse(str, out var v))
+                return v;
+            throw new FormatException();
+        }
     }
 }
