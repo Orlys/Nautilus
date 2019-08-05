@@ -1,14 +1,17 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
 namespace Orlys.Firewall.Internal.Visualizers
 {
     using Orlys.Firewall.Models;
+
     using System.Diagnostics;
-    using System.Net;
 
     internal sealed class InternalRangeTypeVisualizer
     {
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public IPrivateRange Range { get; }
+
         internal InternalRangeTypeVisualizer(IPAddressRange t)
         {
             if (t.Begin.Equals(t.End))
@@ -16,6 +19,7 @@ namespace Orlys.Firewall.Internal.Visualizers
             else
                 this.Range = new LimitedObject(t.Begin.ToString(), t.End.ToString());
         }
+
         internal InternalRangeTypeVisualizer(LocalPortRange t)
         {
             if (t.SpecificPort.HasValue)
@@ -25,6 +29,7 @@ namespace Orlys.Firewall.Internal.Visualizers
             else
                 this.Range = new LimitedObject(t.Begin.ToString(), t.End.ToString());
         }
+
         internal InternalRangeTypeVisualizer(RemotePortRange t)
         {
             if (t.Begin.Equals(t.End))
@@ -33,10 +38,8 @@ namespace Orlys.Firewall.Internal.Visualizers
                 this.Range = new LimitedObject(t.Begin.ToString(), t.End.ToString());
         }
 
-
-        public interface IPrivateRange 
+        public interface IPrivateRange
         {
-
         }
 
         private class SpecificObject : IPrivateRange
@@ -49,7 +52,7 @@ namespace Orlys.Firewall.Internal.Visualizers
             public string Specific { get; }
         }
 
-        private class SingleObject  : IPrivateRange 
+        private class SingleObject : IPrivateRange
         {
             public SingleObject(string single)
             {
@@ -58,13 +61,14 @@ namespace Orlys.Firewall.Internal.Visualizers
 
             public string Single { get; }
         }
-        private class LimitedObject  : IPrivateRange 
+
+        private class LimitedObject : IPrivateRange
         {
             public LimitedObject(string begin, string end)
             {
                 this.Begin = begin;
                 this.End = end;
-            } 
+            }
 
             public string Begin { get; }
             public string End { get; }

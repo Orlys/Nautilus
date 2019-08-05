@@ -1,26 +1,28 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
 namespace Orlys.Firewall.Models
 {
     using Orlys.Firewall.Collections;
     using Orlys.Firewall.Internal.Visualizers;
+
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
-    using System.Linq;
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public enum SpecificPort : byte
-    { 
+    {
         RPC,
         RPC_EPMap,
         IPHTTPS
-    } 
+    }
 
     [DefaultValue(null)]
     [DebuggerTypeProxy(typeof(InternalRangeTypeVisualizer))]
-    public sealed class LocalPortRange : IFixedRange<ushort> , IEquatable<LocalPortRange>
-    { 
+    public sealed class LocalPortRange : IFixedRange<ushort>, IEquatable<LocalPortRange>
+    {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public ushort Begin { get; }
 
@@ -33,7 +35,7 @@ namespace Orlys.Firewall.Models
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public readonly SpecificPort? SpecificPort;
-         
+
         private LocalPortRange(SpecificPort specificPort)
         {
             this.SpecificPort = specificPort;
@@ -110,7 +112,7 @@ namespace Orlys.Firewall.Models
             range = null;
             if (string.IsNullOrWhiteSpace(rangeString))
                 return false;
-             
+
             var from = -1;
             var to = default(int);
             for (int i = 0; i < rangeString.Length; i++)
@@ -129,7 +131,7 @@ namespace Orlys.Firewall.Models
                     continue;
                 else
                 {
-                    if( TryParseSpecific(rangeString, out var sp))
+                    if (TryParseSpecific(rangeString, out var sp))
                     {
                         range = new LocalPortRange(sp.Value);
                         return true;
@@ -158,7 +160,6 @@ namespace Orlys.Firewall.Models
             }
             return true;
         }
-
 
         public static LocalPortRange Parse(string rangeString)
         {
@@ -264,12 +265,12 @@ namespace Orlys.Firewall.Models
 
         public static explicit operator RemotePortRange(LocalPortRange range)
         {
-            if(range.SpecificPort.HasValue)
+            if (range.SpecificPort.HasValue)
             {
                 throw new InvalidCastException();
             }
 
-            return new RemotePortRange(range.Begin, range.End) ;
+            return new RemotePortRange(range.Begin, range.End);
         }
     }
-} 
+}

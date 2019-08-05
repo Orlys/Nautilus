@@ -1,5 +1,7 @@
-﻿using System.Reflection;
-using System.Runtime.CompilerServices;
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 // 組件的一般資訊是由下列的屬性集控制。

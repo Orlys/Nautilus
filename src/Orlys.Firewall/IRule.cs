@@ -1,10 +1,14 @@
-﻿namespace Orlys.Firewall
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
+namespace Orlys.Firewall
 {
     using Orlys.Firewall.Collections;
     using Orlys.Firewall.Enums;
     using Orlys.Firewall.Models;
 
     using System;
+
     using Action = Enums.Action;
 
     public interface IRule : IDisposable
@@ -13,7 +17,7 @@
         Action Action { get; set; }
         string Description { get; set; }
         Direction Direction { get; set; }
-        bool Enabled { get; set; } 
+        bool Enabled { get; set; }
         Guid Id { get; }
         SeparatedList<IPAddressRange> LocalAddresses { get; }
         SeparatedList<LocalPortRange> LocalPorts { get; }

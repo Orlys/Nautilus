@@ -1,4 +1,8 @@
-﻿#pragma warning disable CS0612
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
+#pragma warning disable CS0612
+
 namespace Orlys.Firewall.Enums
 {
     using System;
@@ -21,19 +25,19 @@ namespace Orlys.Firewall.Enums
         /// <summary>
         /// IPv6 Hop-by-Hop Option
         /// </summary>
-        /// <remarks>[RFC8200]</remarks> 
+        /// <remarks>[RFC8200]</remarks>
         public static RichProtocol HOPOPT => s_protocols[0];
 
         /// <summary>
         /// Internet Control Message
         /// </summary>
-        /// <remarks>[RFC792]</remarks> 
+        /// <remarks>[RFC792]</remarks>
         public static RichProtocol ICMP => s_protocols[1];
 
         /// <summary>
         /// Internet Group Management
         /// </summary>
-        /// <remarks>[RFC1112]</remarks> 
+        /// <remarks>[RFC1112]</remarks>
         public static RichProtocol IGMP => s_protocols[2];
 
         /// <summary>
@@ -46,21 +50,21 @@ namespace Orlys.Firewall.Enums
         /// <summary>
         /// IPv4 encapsulation
         /// </summary>
-        /// <remarks>[RFC2003]</remarks> 
+        /// <remarks>[RFC2003]</remarks>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static RichProtocol IPv4 => s_protocols[4];
 
         /// <summary>
         /// Stream
         /// </summary>
-        /// <remarks>[RFC1190][RFC1819]</remarks> 
+        /// <remarks>[RFC1190][RFC1819]</remarks>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static RichProtocol ST => s_protocols[5];
 
         /// <summary>
         /// Transmission Control
         /// </summary>
-        /// <remarks>[RFC793]</remarks> 
+        /// <remarks>[RFC793]</remarks>
         public static RichProtocol TCP => s_protocols[6];
 
         /// <summary>
@@ -318,7 +322,7 @@ namespace Orlys.Firewall.Enums
         /// <summary>
         /// IPv6 encapsulation
         /// </summary>
-        /// <remarks>[RFC2473]</remarks> 
+        /// <remarks>[RFC2473]</remarks>
         public static RichProtocol IPv6 => s_protocols[41];
 
         /// <summary>
@@ -331,13 +335,13 @@ namespace Orlys.Firewall.Enums
         /// <summary>
         /// Routing Header for IPv6
         /// </summary>
-        /// <remarks>[Steve_Deering]</remarks> 
+        /// <remarks>[Steve_Deering]</remarks>
         public static RichProtocol IPv6_Route => s_protocols[43];
 
         /// <summary>
         /// Fragment Header for IPv6
         /// </summary>
-        /// <remarks>[Steve_Deering]</remarks> 
+        /// <remarks>[Steve_Deering]</remarks>
         public static RichProtocol IPv6_Frag => s_protocols[44];
 
         /// <summary>
@@ -357,7 +361,7 @@ namespace Orlys.Firewall.Enums
         /// <summary>
         /// Generic Routing Encapsulation
         /// </summary>
-        /// <remarks>[RFC2784][Tony_Li]</remarks> 
+        /// <remarks>[RFC2784][Tony_Li]</remarks>
         public static RichProtocol GRE => s_protocols[47];
 
         /// <summary>
@@ -434,19 +438,19 @@ namespace Orlys.Firewall.Enums
         /// <summary>
         /// ICMP for IPv6
         /// </summary>
-        /// <remarks>[RFC8200]</remarks> 
+        /// <remarks>[RFC8200]</remarks>
         public static RichProtocol IPv6_ICMP => s_protocols[58];
 
         /// <summary>
         /// No Next Header for IPv6
         /// </summary>
-        /// <remarks>[RFC8200]</remarks> 
+        /// <remarks>[RFC8200]</remarks>
         public static RichProtocol IPv6_NoNxt => s_protocols[59];
 
         /// <summary>
         /// Destination Options for IPv6
         /// </summary>
-        /// <remarks>[RFC8200]</remarks> 
+        /// <remarks>[RFC8200]</remarks>
         public static RichProtocol IPv6_Opts => s_protocols[60];
 
         /// <summary>
@@ -821,13 +825,13 @@ namespace Orlys.Firewall.Enums
         /// <summary>
         /// Virtual Router Redundancy Protocol
         /// </summary>
-        /// <remarks>[RFC5798]</remarks> 
+        /// <remarks>[RFC5798]</remarks>
         public static RichProtocol VRRP => s_protocols[112];
 
         /// <summary>
         /// PGM Reliable Transport Protocol
         /// </summary>
-        /// <remarks>[Tony_Speakman]</remarks> 
+        /// <remarks>[Tony_Speakman]</remarks>
         public static RichProtocol PGM => s_protocols[113];
 
         /// <summary>
@@ -840,7 +844,7 @@ namespace Orlys.Firewall.Enums
         /// <summary>
         /// Layer Two Tunneling Protocol
         /// </summary>
-        /// <remarks>[RFC3931][Bernard_Aboba]</remarks> 
+        /// <remarks>[RFC3931][Bernard_Aboba]</remarks>
         public static RichProtocol L2TP => s_protocols[115];
 
         /// <summary>
@@ -1262,4 +1266,5 @@ namespace Orlys.Firewall.Enums
         public override string ToString() => this.Name.ToString();
     }
 }
+
 #pragma warning restore CS0612

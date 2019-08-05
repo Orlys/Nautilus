@@ -54,6 +54,12 @@
     <None Include="app.manifest" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Orlys.Firewall\Orlys.Firewall.csproj">
+      <Project>{85de8e96-186e-406a-b7c9-ea2b2a0af17a}</Project>
+      <Name>Orlys.Firewall</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <COMReference Include="NetFwTypeLib">
       <Guid>{58FBCF7C-E7A9-467C-80B3-FC65E8FCCA08}</Guid>
       <VersionMajor>1</VersionMajor>

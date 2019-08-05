@@ -1,7 +1,10 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
 namespace Orlys.Firewall.Collections
 {
     using Orlys.Firewall.Internal.Visualizers;
+
     using System;
     using System.Collections;
     using System.Collections.Generic;
@@ -9,7 +12,7 @@ namespace Orlys.Firewall.Collections
     using System.Diagnostics;
     using System.Linq.Expressions;
     using System.Reflection;
-     
+
     [DebuggerDisplay("{_debugString}")]
     [DebuggerTypeProxy(typeof(InternalListVisualizer<>))]
     public class SeparatedList<T> : IReadOnlyCollection<T> where T : IEquatable<T>
@@ -28,14 +31,14 @@ namespace Orlys.Firewall.Collections
                 this.Separator = new string[1] { separator };
             }
 
-            internal protected virtual string[] Split(string payload)
+            protected internal virtual string[] Split(string payload)
             {
                 if (string.IsNullOrWhiteSpace(payload))
                     return null;
                 return payload.Split(this.Separator, StringSplitOptions.RemoveEmptyEntries);
             }
 
-            internal protected virtual string Join(IEnumerable<T> payload)
+            protected internal virtual string Join(IEnumerable<T> payload)
             {
                 return string.Join(this.Separator[0], payload);
             }
@@ -47,9 +50,10 @@ namespace Orlys.Firewall.Collections
         public static readonly HydraBuilder DefaultSeparator = new HydraBuilder(",");
 
         private delegate T ParseDelegate(string str);
+
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private static ParseDelegate s_parse; 
-          
+        private static ParseDelegate s_parse;
+
         internal static readonly string Default;
 
         static SeparatedList()
@@ -60,7 +64,6 @@ namespace Orlys.Firewall.Collections
 
         public static SeparatedList<T> Parse(string str, HydraBuilder hydra = null, Action<string> onStringUpdated = null)
         {
-
             if (s_parse == null)
             {
                 var type = typeof(T);
@@ -82,7 +85,6 @@ namespace Orlys.Firewall.Collections
             }
             hydra = hydra ?? DefaultSeparator;
 
-
             var sep = new SeparatedList<T>(hydra);
             if (onStringUpdated != null)
                 sep.OnStringUpdated += onStringUpdated;
@@ -102,7 +104,6 @@ namespace Orlys.Firewall.Collections
                     }
                     catch
                     {
-
                     }
                 }
             }
@@ -213,10 +214,11 @@ namespace Orlys.Firewall.Collections
 
             yield break;
         }
+
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         public void Notify()
-        { 
+        {
             this.OnStringUpdated?.Invoke(this.ToString());
         }
     }

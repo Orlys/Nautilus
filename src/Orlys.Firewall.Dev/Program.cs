@@ -1,28 +1,23 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
 namespace Orlys.Firewall.Dev
 {
-    
-    using NetFwTypeLib;
-    using Orlys.Firewall.Internal;
     using Orlys.Firewall.Models;
+
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Reflection;
 
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
-        { 
-            var rs = new RuleSet(); 
+        private static void Main(string[] args)
+        {
+            var rs = new RuleSet();
 
-            var rule = rs.AddOrGet("#test");
-
-
-             
-            Console.ReadKey();
+            using (var rule = rs.AddOrGet("#test"))
+            {
+                rule.LocalPorts.Add(SpecificPort.IPHTTPS);
+                Console.ReadKey();
+            }
         }
     }
-
 }

@@ -1,7 +1,10 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
 namespace Orlys.Firewall.Internal.Visualizers
 {
     using Orlys.Firewall.Collections;
+
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -14,6 +17,7 @@ namespace Orlys.Firewall.Internal.Visualizers
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public IEnumerable<T> List { get; }
+
         internal InternalListVisualizer(SeparatedList<T> t)
         {
             //this.Count = t.Count;

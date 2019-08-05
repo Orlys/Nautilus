@@ -1,18 +1,21 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
 namespace Orlys.Firewall
 {
-
-
     using NetFwTypeLib;
-    using Orlys.Firewall.Internal; 
+
     using Orlys.Firewall.Collections;
     using Orlys.Firewall.Enums;
+    using Orlys.Firewall.Internal;
+    using Orlys.Firewall.Models;
+
+    using System;
+    using System.Diagnostics;
+
+    using Action = Enums.Action;
     using Guid = System.Guid;
     using NotSupported = System.NotSupportedException;
-    using Orlys.Firewall.Models;
-    using System;
-    using Action = Enums.Action;
-    using System.Diagnostics;
 
     /// <summary>
     /// 規則物件
@@ -43,23 +46,25 @@ namespace Orlys.Firewall
                 if (x != null)
                     this._r.RemotePorts = x;
             });
+
             this.LocalPorts = SeparatedList<LocalPortRange>.Parse(this._r.LocalPorts, onStringUpdated: x =>
             {
                 if (x != null)
                     this._r.LocalPorts = x;
             });
+
             this.LocalAddresses = SeparatedList<IPAddressRange>.Parse(this._r.LocalAddresses, onStringUpdated: x => this._r.LocalAddresses = x);
             this.RemoteAddresses = SeparatedList<IPAddressRange>.Parse(this._r.RemoteAddresses, onStringUpdated: x => this._r.RemoteAddresses = x);
         }
 
         /// <summary>
         /// 遠端連接埠
-        /// </summary> 
+        /// </summary>
         public SeparatedList<RemotePortRange> RemotePorts { get; }
 
         /// <summary>
         /// 本地連接埠
-        /// </summary> 
+        /// </summary>
         public SeparatedList<LocalPortRange> LocalPorts { get; }
 
         /// <summary>
@@ -69,10 +74,11 @@ namespace Orlys.Firewall
 
         /// <summary>
         /// 遠端位置
-        /// </summary> 
+        /// </summary>
         public SeparatedList<IPAddressRange> RemoteAddresses { get; }
 
         #region Properties
+
         /// <summary>
         /// 規則動作
         /// </summary>
@@ -167,13 +173,12 @@ namespace Orlys.Firewall
         /// </summary>
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public string Grouping => _r.Grouping;
-         
 
         /// <summary>
         /// 刪除
         /// </summary>
         public void Dispose() => this._removeDelegate.Invoke(this.Name);
 
-        #endregion
+        #endregion Properties
     }
 }

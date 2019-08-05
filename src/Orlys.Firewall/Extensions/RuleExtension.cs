@@ -1,9 +1,10 @@
-﻿
-
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
 
 namespace Orlys.Firewall.Extensions
 {
     using Orlys.Firewall.Enums;
+
     using Action = Enums.Action;
 
     public static class RuleExtension

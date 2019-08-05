@@ -1,16 +1,12 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
 namespace Orlys.Firewall.Internal
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-
-     
-    using System.Net;
     using NetFwTypeLib;
-     
+
+    using System;
+
     internal static class FwTypes
     {
         private static T Create<T>(string progId)
@@ -20,6 +16,7 @@ namespace Orlys.Firewall.Internal
         }
 
         internal static INetFwPolicy2 CreatePolicy2() => Create<INetFwPolicy2>("HNetCfg.FwPolicy2");
+
         internal static INetFwRule CreateRule() => Create<INetFwRule>("HNetCfg.FwRule");
     }
 }

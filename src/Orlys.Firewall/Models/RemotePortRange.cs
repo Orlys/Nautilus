@@ -1,8 +1,11 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
 namespace Orlys.Firewall.Models
 {
     using Orlys.Firewall.Collections;
     using Orlys.Firewall.Internal.Visualizers;
+
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
@@ -20,7 +23,6 @@ namespace Orlys.Firewall.Models
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly bool _isSinglePort;
-
 
         public RemotePortRange(ushort first, ushort second)
         {
@@ -61,13 +63,11 @@ namespace Orlys.Firewall.Models
 
         public override string ToString()
         {
-
             if (this._isSinglePort)
                 return this.Begin.ToString();
 
             return string.Format("{0}-{1}", this.Begin, this.End);
         }
-
 
         public static bool TryParse(string rangeString, out RemotePortRange range)
         {
@@ -117,7 +117,6 @@ namespace Orlys.Firewall.Models
             }
             return true;
         }
-
 
         public static RemotePortRange Parse(string rangeString)
         {
@@ -180,6 +179,7 @@ namespace Orlys.Firewall.Models
                 yield return i;
             yield return this.End;
         }
+
         public override int GetHashCode()
         {
             return this.ToString().GetHashCode();
@@ -212,8 +212,8 @@ namespace Orlys.Firewall.Models
         }
 
         public static implicit operator LocalPortRange(RemotePortRange range)
-        { 
+        {
             return new LocalPortRange(range.Begin, range.End);
         }
     }
-} 
+}

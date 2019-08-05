@@ -1,4 +1,6 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
 // Author: Orlys
 // Github: https://github.com/Orlys
 
@@ -38,8 +40,6 @@ namespace Orlys.Firewall.Internal
             }
         }
 
-
-
         public static string Explode<T>(this T enums) where T : struct, Enum
         {
             return EnumHelper<T>.Explore(enums);
@@ -49,12 +49,14 @@ namespace Orlys.Firewall.Internal
         {
             return EnumHelper<T>.Implode(str);
         }
-        static class EnumHelper<T> where T : struct, Enum
+
+        private static class EnumHelper<T> where T : struct, Enum
         {
             static EnumHelper()
             {
                 Array = (T[])Enum.GetValues(typeof(T));
             }
+
             public static T[] Array { get; }
 
             public static IList<T> Filter(T value)
@@ -73,6 +75,7 @@ namespace Orlys.Firewall.Internal
                 var filter = Filter(value);
                 return string.Join(separator, filter);
             }
+
             public static T Implode(string str, string separator = ",")
             {
                 var data = str.Split(new string[1] { separator }, StringSplitOptions.RemoveEmptyEntries);
@@ -97,5 +100,4 @@ namespace Orlys.Firewall.Internal
             }
         }
     }
-
 }

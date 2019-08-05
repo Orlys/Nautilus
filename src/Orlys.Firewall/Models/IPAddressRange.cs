@@ -1,4 +1,7 @@
-﻿namespace Orlys.Firewall.Models
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
+namespace Orlys.Firewall.Models
 {
     using Orlys.Firewall.Collections;
     using Orlys.Firewall.Internal;
