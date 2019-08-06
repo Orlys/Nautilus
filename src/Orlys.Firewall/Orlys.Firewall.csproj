@@ -37,6 +37,8 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Internal\ExpressionCache\TryParseHelper.cs" />
+    <Compile Include="Internal\ExpressionCache\ParseHelper.cs" />
     <Compile Include="Internal\Visualizer\InternalListVisualizer`1.cs" />
     <Compile Include="Enums\Enums.cs" />
     <Compile Include="Internal\FwTypes.cs" />
@@ -44,6 +46,7 @@
     <Compile Include="Internal\Bits.cs" />
     <Compile Include="IRule.cs" />
     <Compile Include="Internal\Visualizer\InternalRangeTypeVisualizer.cs" />
+    <Compile Include="IRuleSet.cs" />
     <Compile Include="Models\IPAddressRange.cs" />
     <Compile Include="Models\LocalPortRange.cs" />
     <Compile Include="Models\RemotePortRange.cs" />

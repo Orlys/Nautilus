@@ -15,7 +15,7 @@ namespace Orlys.Firewall
 
     [DebuggerDisplay("{s_grouping}")]
     [DebuggerTypeProxy(typeof(InternalRuleSetVisualizer))]
-    public class RuleSet
+    public class RuleSet : IRuleSet
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly static string s_grouping = Assembly.GetEntryAssembly().GetCustomAttribute<AssemblyProductAttribute>().Product;
@@ -52,6 +52,7 @@ namespace Orlys.Firewall
             if (!this.InternalList.TryGetValue(name, out var rule))
             {
                 var r = FwTypes.CreateRule();
+                r.Enabled = true;
                 r.Name = name;
                 r.Grouping = s_grouping;
                 this._policy.Rules.Add(r);

@@ -13,10 +13,11 @@ namespace Orlys.Firewall.Dev
         {
             var rs = new RuleSet();
 
+            
+
             using (var rule = rs.AddOrGet("#test"))
             {
-                rule.LocalPorts.Add(SpecificPort.IPHTTPS);
-                Console.ReadKey();
+
             }
         }
     }

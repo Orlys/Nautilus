@@ -26,13 +26,10 @@ namespace Orlys.Firewall
         RichProtocol Protocol { get; set; }
         SeparatedList<IPAddressRange> RemoteAddresses { get; }
         SeparatedList<RemotePortRange> RemotePorts { get; }
-    }
 
-    public interface IAdvanceRule : IRule
-    {
         string IcmpTypesAndCodes { get; set; }
         string ApplicationName { get; set; }
         InterfaceTypes InterfaceTypes { get; set; }
         string ServiceName { get; set; }
-    }
+    } 
 }

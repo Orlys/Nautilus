@@ -21,13 +21,20 @@ namespace Orlys.Firewall
     /// 規則物件
     /// </summary>
     [DebuggerDisplay("{Name}")]
-    public sealed class Rule : IRule, IAdvanceRule, IDisposable
+    public sealed class Rule : IRule, IDisposable
     {
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly Func<string, bool> _removeDelegate;
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly INetFwRule _r;
+
+        /*
+        private readonly string RemotePortsRaw;
+        private readonly string RemoteAddressesRaw;
+        private readonly string LocalPortsRaw;
+        private readonly string LocalAddressesRaw;
+        */
 
         /// <summary>
         /// 唯一識別 ID
@@ -50,7 +57,9 @@ namespace Orlys.Firewall
             this.LocalPorts = SeparatedList<LocalPortRange>.Parse(this._r.LocalPorts, onStringUpdated: x =>
             {
                 if (x != null)
+                {
                     this._r.LocalPorts = x;
+                }
             });
 
             this.LocalAddresses = SeparatedList<IPAddressRange>.Parse(this._r.LocalAddresses, onStringUpdated: x => this._r.LocalAddresses = x);
@@ -121,18 +130,18 @@ namespace Orlys.Firewall
         /// <summary>
         /// 應用程式名稱
         /// </summary>
-        string IAdvanceRule.ApplicationName { get => this._r.ApplicationName; set => this._r.ApplicationName = value; }
+        public string ApplicationName { get => this._r.ApplicationName; set => this._r.ApplicationName = value; }
 
         /// <summary>
         /// 服務名稱
         /// </summary>
-        string IAdvanceRule.ServiceName { get => this._r.serviceName; set => this._r.serviceName = value; }
+        public string ServiceName { get => this._r.serviceName; set => this._r.serviceName = value; }
 
         /// <summary>
         /// ICMP 協定設定
         /// </summary>
         /// <see cref="http://bit.ly/2Ytw71t"/>
-        string IAdvanceRule.IcmpTypesAndCodes
+        public string IcmpTypesAndCodes
         {
             get
             {
