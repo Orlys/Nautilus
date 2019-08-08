@@ -9,9 +9,11 @@ namespace Orlys.Firewall
     using Orlys.Firewall.Internal.Visualizers;
 
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
 
     [DebuggerDisplay("{s_grouping}")]
     [DebuggerTypeProxy(typeof(InternalRuleSetVisualizer))]
@@ -25,79 +27,100 @@ namespace Orlys.Firewall
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly INetFwPolicy2 _policy;
+         
 
         public RuleSet()
         {
             this._policy = FwTypes.CreatePolicy2();
-            foreach (INetFwRule rule in this._policy.Rules)
+            lock (this.InternalList)
             {
-                if (string.Equals(rule.Grouping, s_grouping, StringComparison.InvariantCultureIgnoreCase))
+                foreach (INetFwRule rule in this._policy.Rules)
                 {
-                    var r = new Rule(this.Remove, rule, null);
-                    this.InternalList.Add(r.Name, r);
+                    if (string.Equals(rule.Grouping, s_grouping, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        var r = new Rule(this.Remove, rule, null);
+                        this.InternalList.Add(r.Name, r);
+                    }
                 }
             }
         }
 
-        private void IsNullOrEmpty(string name)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static void IsNullOrEmpty(string name)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
         }
 
+        
         public IRule AddOrGet(string name)
         {
-            this.IsNullOrEmpty(name);
+            IsNullOrEmpty(name);
 
-            if (!this.InternalList.TryGetValue(name, out var rule))
+            lock (this.InternalList)
             {
-                var r = FwTypes.CreateRule();
-                r.Enabled = true;
-                r.Name = name;
-                r.Grouping = s_grouping;
-                this._policy.Rules.Add(r);
 
-                r = this._policy.Rules.Item(name);
-                rule = new Rule(this.Remove, r, null);
+                if (!this.InternalList.TryGetValue(name, out var rule))
+                {
+                    var r = FwTypes.CreateRule();
+                    r.Enabled = true;
+                    r.Name = name;
+                    r.Grouping = s_grouping;
+                    this._policy.Rules.Add(r);
+
+                    r = this._policy.Rules.Item(name);
+                    rule = new Rule(this.Remove, r, null);
+                    this.InternalList.Add(name, rule);
+                }
+                return rule;
             }
-            return rule;
         }
+
 
         public bool Remove(string name)
         {
-            this.IsNullOrEmpty(name);
+            IsNullOrEmpty(name);
 
-            if (this.InternalList.Remove(name))
+            lock (this.InternalList)
             {
-                this._policy.Rules.Remove(name);
-                return true;
+                if (this.InternalList.Remove(name))
+                {
+                    this._policy.Rules.Remove(name);
+                    return true;
+                }
+                return false;
             }
-            return false;
         }
 
         public void Clear()
         {
-            var names = this.InternalList.Keys;
-            foreach (var name in names)
+            lock (this.InternalList)
             {
-                this.Remove(name);
+                var names = this.InternalList.Keys;
+                foreach (var name in names)
+                {
+                    this.Remove(name);
+                }
             }
         }
 
         public IEnumerable<IRule> GetList(Predicate<IRule> filter = null)
         {
-            if (filter == null)
-                return this.InternalList.Values;
-
-            IEnumerable<IRule> iterator()
+            lock (this.InternalList)
             {
-                foreach (var rule in this.InternalList.Values)
+                if (filter == null)
+                    return this.InternalList.Values;
+
+                IEnumerable<IRule> iterator()
                 {
-                    if (filter(rule))
-                        yield return rule;
+                    foreach (var rule in this.InternalList.Values)
+                    {
+                        if (filter(rule))
+                            yield return rule;
+                    }
                 }
+                return iterator();
             }
-            return iterator();
         }
     }
 }
