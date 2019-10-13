@@ -8,26 +8,41 @@ namespace Orlys.Firewall.Dev
     using System;
     using System.Diagnostics;
     using System.Net;
+    using System.Security;
+    using System.Security.Permissions;
+    using System.Security.Principal;
 
     internal class Program
-    {
-        private readonly static RuleSet rs;
-        private readonly static IRule rule;
-        static Program()
-        {
-            rs = new RuleSet();
-            rule = rs.AddOrGet("#test");
-        }
-
+    { 
         private static void Main(string[] args)
         {
-            rule.RemoteAddresses.Add(new IPAddress(12));
+            var admin = WindowsIdentity.GetCurrent();
+            var isAdmin = new WindowsPrincipal(admin).IsInRole(WindowsBuiltInRole.Administrator);
+            Console.WriteLine(isAdmin);
+
+            try
+            {
+               var rs = new RuleSet();
+                Console.WriteLine("OK");
+            }
+            catch (SecurityException)
+            {
+                Console.WriteLine("Fail");
+            }
 
             Console.ReadKey();
-        }
-        ~Program()
-        {
-            rule.Dispose();
-        }
+
+            AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
+            try
+            {
+                var rs = new RuleSet();
+                Console.WriteLine("OK");
+            }
+            catch (SecurityException)
+            {
+                Console.WriteLine("Fail");
+            }
+
+        } 
     }
 }

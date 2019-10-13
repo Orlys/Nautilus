@@ -15,5 +15,5 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 [assembly: Guid("85de8e96-186e-406a-b7c9-ea2b2a0af17a")]
-[assembly: AssemblyVersion("1.0.112.7156")]
+[assembly: AssemblyVersion("1.0.122.7225")]
 [assembly: InternalsVisibleTo("Orlys.Firewall.Dev")]
