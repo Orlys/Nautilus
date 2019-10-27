@@ -3,46 +3,36 @@
 
 namespace Orlys.Firewall.Dev
 {
+    using Orlys.Network;
     using Orlys.Firewall.Models;
 
     using System;
     using System.Diagnostics;
+    using System.Linq;
+    using System.Linq.Expressions;
     using System.Net;
     using System.Security;
     using System.Security.Permissions;
     using System.Security.Principal;
 
+
+
     internal class Program
     { 
         private static void Main(string[] args)
         {
-            var admin = WindowsIdentity.GetCurrent();
-            var isAdmin = new WindowsPrincipal(admin).IsInRole(WindowsBuiltInRole.Administrator);
-            Console.WriteLine(isAdmin);
-
             try
             {
-               var rs = new RuleSet();
-                Console.WriteLine("OK");
+                foreach (var ipv4 in Query.Execute(QuerySelectors.IPv4))
+                {
+                    Console.WriteLine(ipv4.State + ": " + ipv4.Local + " <-> " + ipv4.Remote + ": " + ipv4.ProcessIdentifier);
+                }
             }
-            catch (SecurityException)
+            catch (Exception e)
             {
-                Console.WriteLine("Fail");
+                Console.WriteLine(e);
             }
-
-            Console.ReadKey();
-
-            AppDomain.CurrentDomain.SetPrincipalPolicy(PrincipalPolicy.WindowsPrincipal);
-            try
-            {
-                var rs = new RuleSet();
-                Console.WriteLine("OK");
-            }
-            catch (SecurityException)
-            {
-                Console.WriteLine("Fail");
-            }
-
         } 
     }
 }
+

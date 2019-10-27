@@ -1,9 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace Orlys.Firewall
 {
-    public interface IRuleSet
+    using System;
+    using System.Collections.Generic;
+
+    internal interface IRuleSet
     {
         IRule AddOrGet(string name);
         void Clear();
