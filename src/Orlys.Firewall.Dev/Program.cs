@@ -23,7 +23,7 @@ namespace Orlys.Firewall.Dev
         {
             try
             {
-                foreach (var ipv4 in Query.Execute(QuerySelectors.IPv4))
+                foreach (var ipv4 in Query.Execute(QuerySelectors.IPv4).Concat(Query.Execute(QuerySelectors.IPv6)))
                 {
                     Console.WriteLine(ipv4.State + ": " + ipv4.Local + " <-> " + ipv4.Remote + ": " + ipv4.ProcessIdentifier);
                 }

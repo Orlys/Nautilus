@@ -1,4 +1,6 @@
-﻿namespace Orlys.Network.Internal
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+namespace Orlys.Network.Internal
 {
     using System.Runtime.InteropServices;
 
@@ -6,9 +8,9 @@
     [StructLayout(LayoutKind.Sequential)]
     internal struct IPv6Table
     {
-        internal uint dwNumEntries;
+        private uint _dwNumEntries;
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = 1)]
-        internal IPv6Row[] table;
+        private IPv6Row[] _table;
     }
 
 }

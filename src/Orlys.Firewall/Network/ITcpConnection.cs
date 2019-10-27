@@ -1,4 +1,5 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
 namespace Orlys.Network
 {
     using System.Net;

@@ -1,4 +1,6 @@
-﻿namespace Orlys.Network.Internal
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+namespace Orlys.Network.Internal
 {
     using System.Runtime.InteropServices;
     using System;
@@ -41,9 +43,8 @@
                         Expression.Call(typeof(Marshal).GetMethod(nameof(Marshal.PtrToStructure), s_signture),
                             parameter,
                             Expression.Constant(this.TableType)), this.TableType),
-                    "dwNumEntries");
-            var lm = Expression.Lambda(field, parameter);
-            this.CalculateEntries = (Func<IntPtr, uint>)lm.Compile();
+                    "_dwNumEntries");
+            this.CalculateEntries = (Func<IntPtr, uint>)Expression.Lambda(field, parameter).Compile();
 
             // (intptr) => (ITrafficAdaptable)Marshal.PtrToStructure(intptr, typeof(TRow)).ToTraffic();
             var traffic =

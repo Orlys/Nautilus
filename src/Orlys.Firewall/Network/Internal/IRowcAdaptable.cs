@@ -1,4 +1,6 @@
-﻿namespace Orlys.Network.Internal
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+namespace Orlys.Network.Internal
 {
     internal interface IRowAdaptable
     {
