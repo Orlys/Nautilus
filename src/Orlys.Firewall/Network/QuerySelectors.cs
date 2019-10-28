@@ -2,8 +2,9 @@
 // Github: https://github.com/Orlys
 namespace Orlys.Network
 {
-    using System.Net.Sockets;
     using Orlys.Network.Internal;
+
+    using System.Net.Sockets;
 
     public static class QuerySelectors
     {

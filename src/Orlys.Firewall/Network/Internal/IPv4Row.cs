@@ -2,10 +2,10 @@
 // Github: https://github.com/Orlys
 namespace Orlys.Network.Internal
 {
-    using System.Runtime.InteropServices;
     using System;
-    using System.Net;
     using System.ComponentModel;
+    using System.Net;
+    using System.Runtime.InteropServices;
 
     // https://docs.microsoft.com/en-us/windows/win32/api/tcpmib/ns-tcpmib-mib_tcprow_owner_pid
     [StructLayout(LayoutKind.Sequential)]
@@ -17,6 +17,7 @@ namespace Orlys.Network.Internal
 
         private byte _localPort1;
         private byte _localPort0;
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("unused field", true)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
@@ -26,6 +27,7 @@ namespace Orlys.Network.Internal
 
         private byte _remotePort1;
         private byte _remotePort0;
+
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("unused field", true)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
@@ -46,5 +48,4 @@ namespace Orlys.Network.Internal
             return new RowAdapter(local, remote, this._state, this._owningPid);
         }
     }
-
 }

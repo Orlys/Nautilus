@@ -3,27 +3,37 @@
 namespace Orlys.Network.Internal
 {
     using Orlys.Network;
-    using System.Net;
 
-    internal sealed class RowAdapter : ITcpConnection
+    using System;
+    using System.Net;
+    using System.Net.NetworkInformation;
+
+    internal sealed class RowAdapter : TcpConnectionInformation, ITcpConnectionInformation
     {
         internal RowAdapter(IPEndPoint local, IPEndPoint remote, uint state, uint owningPid)
         {
-            this.Local = local;
-            this.Remote = remote;
+            this.LocalEndPoint = local;
+            this.RemoteEndPoint = remote;
             this.State = (TcpState)state;
             this.ProcessIdentifier = (int)owningPid;
         }
 
+        public override TcpState State { get; }
 
-        public TcpState State { get; }
+        public override IPEndPoint LocalEndPoint { get; }
 
-        public IPEndPoint Local { get; }
-
-        public IPEndPoint Remote { get; }
+        public override IPEndPoint RemoteEndPoint { get; }
 
         public int ProcessIdentifier { get; }
 
+        public string ToString(string format, params Func<ITcpConnectionInformation, object>[] selector)
+        {
+            var objs = new object[selector.Length];
+            for (int i = 0; i < objs.Length; i++)
+            {
+                objs[i] = selector[i]?.Invoke(this);
+            }
+            return string.Format(format, objs);
+        }
     }
-
 }

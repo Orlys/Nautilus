@@ -9,14 +9,11 @@ namespace Orlys.Firewall
     using Orlys.Firewall.Internal.Visualizers;
 
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using System.Security.Permissions;
-    using System.Security.Principal;
-     
+
     [DebuggerDisplay("{s_grouping}")]
     [DebuggerTypeProxy(typeof(InternalRuleSetVisualizer))]
     public class RuleSet : IRuleSet
@@ -29,16 +26,15 @@ namespace Orlys.Firewall
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private readonly INetFwPolicy2 _policy;
-         
+
         /// <summary>
         /// 防火牆規則集
         /// </summary>
         public RuleSet()
         {
-        //    var user = WindowsIdentity.GetCurrent();
-        //    WindowsPrincipal principal = new WindowsPrincipal(user);
-        //    isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
-
+            //    var user = WindowsIdentity.GetCurrent();
+            //    WindowsPrincipal principal = new WindowsPrincipal(user);
+            //    isAdmin = principal.IsInRole(WindowsBuiltInRole.Administrator);
 
             this._policy = FwTypes.CreatePolicy2();
             lock (this.InternalList)
@@ -61,14 +57,12 @@ namespace Orlys.Firewall
                 throw new ArgumentNullException(nameof(name));
         }
 
-        
         public IRule AddOrGet(string name)
         {
             IsNullOrEmpty(name);
 
             lock (this.InternalList)
             {
-
                 if (!this.InternalList.TryGetValue(name, out var rule))
                 {
                     var r = FwTypes.CreateRule();
@@ -84,7 +78,6 @@ namespace Orlys.Firewall
                 return rule;
             }
         }
-
 
         public bool Remove(string name)
         {

@@ -31,5 +31,5 @@ namespace Orlys.Firewall
         string ApplicationName { get; set; }
         InterfaceTypes InterfaceTypes { get; set; }
         string ServiceName { get; set; }
-    } 
+    }
 }

@@ -1,11 +1,10 @@
-﻿
-// Author: Orlys
+﻿// Author: Orlys
 // Github: https://github.com/Orlys
 namespace Orlys.Network
 {
     using System;
-    using System.Net.Sockets;
     using System.ComponentModel;
+    using System.Net.Sockets;
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public interface IQuerySelector
@@ -20,6 +19,6 @@ namespace Orlys.Network
         Func<IntPtr, uint> CalculateEntries { get; }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        Func<IntPtr, ITcpConnection> Adapt { get; }
+        Func<IntPtr, ITcpConnectionInformation> Adapt { get; }
     }
 }

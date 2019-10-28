@@ -1,13 +1,12 @@
-﻿
-namespace Orlys.Firewall.Internal.ExpressionCache
+﻿namespace Orlys.Firewall.Internal.ExpressionCache
 {
-    using System; 
+    using System;
     using System.Linq.Expressions;
-    using System.Reflection; 
+    using System.Reflection;
 
     internal static class TryParseHelper<T>
     {
-        public delegate bool Delegate(string str,out T result);
+        public delegate bool Delegate(string str, out T result);
 
         private static readonly Delegate s_tryParse;
 
@@ -52,6 +51,4 @@ namespace Orlys.Firewall.Internal.ExpressionCache
             return parse != null;
         }
     }
-
-     
 }

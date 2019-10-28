@@ -6,5 +6,4 @@ namespace Orlys.Network.Internal
     {
         RowAdapter ToRowAdapter();
     }
-
 }

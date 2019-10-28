@@ -1,5 +1,4 @@
-﻿
-namespace Orlys.Firewall.Internal.ExpressionCache
+﻿namespace Orlys.Firewall.Internal.ExpressionCache
 {
     using System.Linq.Expressions;
     using System.Reflection;
@@ -11,7 +10,7 @@ namespace Orlys.Firewall.Internal.ExpressionCache
         private static readonly Delegate s_parse;
 
         static ParseHelper()
-        { 
+        {
             var type = typeof(T);
             var arg = typeof(string);
             var method = type.GetMethod("Parse", BindingFlags.Public | BindingFlags.Static);
@@ -27,7 +26,7 @@ namespace Orlys.Firewall.Internal.ExpressionCache
             var parameter = Expression.Parameter(arg);
             var call = Expression.Call(method, parameter);
             var lambda = Expression.Lambda<Delegate>(call, parameter);
-            s_parse = lambda.Compile(); 
+            s_parse = lambda.Compile();
         }
 
         public static bool TryGetParser(out Delegate parse)
@@ -36,6 +35,4 @@ namespace Orlys.Firewall.Internal.ExpressionCache
             return parse != null;
         }
     }
-
-     
 }

@@ -60,9 +60,9 @@
     <Compile Include="Network\Internal\IRowcAdaptable.cs" />
     <Compile Include="Network\Internal\RowAdapter.cs" />
     <Compile Include="Network\IQuerySelector.cs" />
-    <Compile Include="Network\ITcpConnection.cs" />
+    <Compile Include="Network\ITcpConnectionInformation.cs" />
     <Compile Include="Network\QuerySelectors.cs" />
-    <Compile Include="Network\TcpState.cs" />
+    <Compile Include="Network\Utilities\NetworkHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Firewall\Enums\Protocol.cs" />
     <Compile Include="Firewall\Rule.cs" />

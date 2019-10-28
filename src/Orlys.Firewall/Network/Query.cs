@@ -2,20 +2,15 @@
 // Github: https://github.com/Orlys
 namespace Orlys.Network
 {
-    using System.Runtime.InteropServices;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Net.Sockets;
-    using System.Net;
-    using System.Linq.Expressions;
-    using System.Reflection;
+    using System.Runtime.InteropServices;
 
     public static class Query
     {
         // https://docs.microsoft.com/zh-tw/windows/win32/api/iprtrmib/ne-iprtrmib-tcp_table_class
         private const int TCP_TABLE_OWNER_PID_ALL = 5;
-
 
         [DllImport("iphlpapi.dll", SetLastError = true)]
         private static extern uint GetExtendedTcpTable(
@@ -27,17 +22,17 @@ namespace Orlys.Network
             int reserved = 0);
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="queryBuilder"> Using <see cref="QuerySelectors.IPv4"/> or <see cref="QuerySelectors.IPv6"/> to query tcp status.
         /// </param>
         /// <returns></returns>
-        public static IReadOnlyList<ITcpConnection> Execute(IQuerySelector queryBuilder)
+        public static IReadOnlyList<ITcpConnectionInformation> Execute(IQuerySelector queryBuilder)
         {
             if (queryBuilder == null)
                 throw new ArgumentNullException(nameof(queryBuilder));
 
-            var result = new List<ITcpConnection>();
+            var result = new List<ITcpConnectionInformation>();
             var buffSize = default(int);
             var tcpTablePtr = IntPtr.Zero;
 
@@ -78,21 +73,20 @@ namespace Orlys.Network
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="queryBuilder"> Using <see cref="QuerySelectors.IPv4"/> or <see cref="QuerySelectors.IPv6"/> to query tcp status.
         /// </param>
         /// <param name="filter"></param>
         /// <returns></returns>
-        public static IReadOnlyList<ITcpConnection> Execute(IQuerySelector queryBuilder, Predicate<ITcpConnection> filter)
+        public static IReadOnlyList<ITcpConnectionInformation> Execute(IQuerySelector queryBuilder, Predicate<ITcpConnectionInformation> filter)
         {
             if (queryBuilder == null)
                 throw new ArgumentNullException(nameof(queryBuilder));
             if (filter == null)
                 return Execute(queryBuilder);
 
-
-            var result = new List<ITcpConnection>();
+            var result = new List<ITcpConnectionInformation>();
             var buffSize = default(int);
             var tcpTablePtr = IntPtr.Zero;
 

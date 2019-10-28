@@ -2,19 +2,17 @@
 // Github: https://github.com/Orlys
 namespace Orlys.Network.Internal
 {
-    using System.Runtime.InteropServices;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net.Sockets;
-    using System.Linq.Expressions;
-    using System.Reflection;
     using Orlys.Network;
+
+    using System;
+    using System.Linq.Expressions;
+    using System.Net.Sockets;
+    using System.Reflection;
+    using System.Runtime.InteropServices;
 
     internal sealed class InternalQuerySelector<TTable, TRow> : IQuerySelector
         where TRow : IRowAdaptable
     {
-
         public int RowSize { get; }
         public AddressFamily AddressFamily { get; }
         public Type TableType { get; }
@@ -22,7 +20,7 @@ namespace Orlys.Network.Internal
 
         public Func<IntPtr, uint> CalculateEntries { get; }
 
-        public Func<IntPtr, ITcpConnection> Adapt { get; }
+        public Func<IntPtr, ITcpConnectionInformation> Adapt { get; }
 
         private static readonly Type[] s_signture = { typeof(IntPtr), typeof(Type) };
 
@@ -53,8 +51,7 @@ namespace Orlys.Network.Internal
                         Expression.Call(typeof(Marshal).GetMethod(nameof(Marshal.PtrToStructure), s_signture),
                             parameter,
                             Expression.Constant(this.RowType)), typeof(IRowAdaptable)), typeof(IRowAdaptable).GetMethod(nameof(IRowAdaptable.ToRowAdapter), BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic));
-            this.Adapt = (Func<IntPtr, ITcpConnection>)Expression.Lambda(traffic, parameter).Compile();
+            this.Adapt = (Func<IntPtr, ITcpConnectionInformation>)Expression.Lambda(traffic, parameter).Compile();
         }
     }
-
 }

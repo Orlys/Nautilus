@@ -5,8 +5,10 @@ namespace Orlys.Firewall.Extensions
 {
     using Orlys.Firewall.Collections;
     using Orlys.Firewall.Enums;
+
     using System;
     using System.Collections.Generic;
+
     using Action = Enums.Action;
 
     public static class RuleExtension
@@ -52,33 +54,37 @@ namespace Orlys.Firewall.Extensions
             rule.ApplicationName = appName;
             return rule;
         }
+
         public static IRule WithServiceName(this IRule rule, string serviceName)
         {
             rule.ServiceName = serviceName;
             return rule;
         }
 
-
         public static SeparatedList<T> Add<T>(this SeparatedList<T> sl, T value, bool flush = true) where T : IEquatable<T>
         {
             sl.Add(value, flush);
             return sl;
         }
-        public static SeparatedList<T> BulkAdd<T>(this SeparatedList<T> sl, IEnumerable< T> values, bool flush = true) where T : IEquatable<T>
+
+        public static SeparatedList<T> BulkAdd<T>(this SeparatedList<T> sl, IEnumerable<T> values, bool flush = true) where T : IEquatable<T>
         {
             sl.BulkAdd(values, flush);
             return sl;
         }
+
         public static SeparatedList<T> Remove<T>(this SeparatedList<T> sl, T value, bool flush = false) where T : IEquatable<T>
         {
             sl.Remove(value, flush);
             return sl;
         }
+
         public static SeparatedList<T> Clear<T>(this SeparatedList<T> sl, bool flush = false) where T : IEquatable<T>
         {
             sl.Clear(flush);
             return sl;
         }
+
         public static SeparatedList<T> Flush<T>(this SeparatedList<T> sl) where T : IEquatable<T>
         {
             sl.Flush();

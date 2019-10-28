@@ -9,8 +9,8 @@ namespace Orlys.Network.Internal
     internal struct IPv4Table
     {
         private uint _dwNumEntries;
+
         [MarshalAs(UnmanagedType.ByValArray, ArraySubType = UnmanagedType.Struct, SizeConst = 1)]
         private IPv4Row[] _table;
     }
-
 }

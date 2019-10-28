@@ -96,6 +96,5 @@ namespace Orlys.Firewall.Enums
         /// 當網路介面卡連接至某個網路，同時可以在這個網路偵測到電腦所加入網域中的網域控制站，則會套用至網路介面卡。
         /// </summary>
         Domain = 1
-
     }
 }

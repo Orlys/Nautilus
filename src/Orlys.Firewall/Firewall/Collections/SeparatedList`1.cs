@@ -3,15 +3,14 @@
 
 namespace Orlys.Firewall.Collections
 {
-    using Orlys.Firewall.Internal.Visualizers;
     using Orlys.Firewall.Internal.ExpressionCache;
+    using Orlys.Firewall.Internal.Visualizers;
 
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
-    using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading;
 
@@ -50,7 +49,6 @@ namespace Orlys.Firewall.Collections
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public static readonly HydraBuilder DefaultSeparator = new HydraBuilder(",");
-          
 
         internal static readonly string Default;
 
@@ -62,14 +60,12 @@ namespace Orlys.Firewall.Collections
 
         public static SeparatedList<T> Parse(string str, HydraBuilder hydra = null, Action<string> onStringUpdated = null)
         {
-
             hydra = hydra ?? DefaultSeparator;
 
             var sep = new SeparatedList<T>(hydra);
             if (onStringUpdated != null)
                 sep.OnStringUpdated += onStringUpdated;
 
-           
             if (!(string.IsNullOrWhiteSpace(str) || string.Equals(str.Trim(), Default)))
             {
                 var splited = hydra.Split(str);
@@ -145,7 +141,6 @@ namespace Orlys.Firewall.Collections
         public bool Contains(T item)
         {
             return this.InternalList.Contains(item);
-
         }
 
         public bool Remove(T item, bool flush = false)
@@ -154,26 +149,21 @@ namespace Orlys.Firewall.Collections
             if (r && flush)
                 this.Flush();
             return r;
-
         }
 
         public void Clear(bool flush = false)
         {
-
             this.InternalList.Clear();
             if (flush)
                 this.Flush();
-
         }
 
         public override string ToString()
         {
-
             if (this.Count == 0)
                 return Default;
 
             return this._joinHandler.Invoke(this.InternalList);
-
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -187,7 +177,6 @@ namespace Orlys.Firewall.Collections
 
         public IEnumerator<T> GetEnumerator()
         {
-
             var e = this.InternalList.GetEnumerator();
             switch (this.Count)
             {
@@ -224,7 +213,6 @@ namespace Orlys.Firewall.Collections
             }
 
             yield break;
-
         }
 
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
