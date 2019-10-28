@@ -63,7 +63,7 @@
     <Compile Include="Network\ITcpConnectionInformation.cs" />
     <Compile Include="Network\QuerySelectors.cs" />
     <Compile Include="Network\Utilities\NetworkHelper.cs" />
-    <Compile Include="PollingServices\PollEventArgs`1.cs" />
+    <Compile Include="PollingServices\PollingEventArgs`1.cs" />
     <Compile Include="PollingServices\Polling`1.cs" />
     <Compile Include="PollingServices\PollingCycle.cs" />
     <Compile Include="PollingServices\PollingOptions`1.cs" />

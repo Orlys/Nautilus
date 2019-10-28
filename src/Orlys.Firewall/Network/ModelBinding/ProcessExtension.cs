@@ -9,7 +9,7 @@ namespace Orlys.Network.ModelBinding
     {
         public static Process Bind(this ITcpConnectionInformation connection)
         {
-            return Process.GetProcessById(connection.ProcessIdentifier + 8);
+            return Process.GetProcessById(connection.ProcessIdentifier);
         }
     }
 }

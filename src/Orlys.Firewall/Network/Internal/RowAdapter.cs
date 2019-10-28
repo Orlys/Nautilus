@@ -35,5 +35,13 @@ namespace Orlys.Network.Internal
             }
             return string.Format(format, objs);
         }
+        
+        public bool Equals(ITcpConnectionInformation other)
+        {
+            return other.LocalEndPoint.Equals(this.LocalEndPoint) &&
+               other.RemoteEndPoint.Equals(this.RemoteEndPoint) &&
+               other.ProcessIdentifier.Equals(this.ProcessIdentifier);
+        }
+
     }
 }

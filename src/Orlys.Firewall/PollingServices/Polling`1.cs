@@ -68,7 +68,6 @@
                 do
                 {
                     this._options.Cycle.Adjust(this._queue.Count, out timeSpan);
-                    Console.WriteLine("Cycle: " + timeSpan);
                     if (this._queue.TryDequeue(out var current))
                     {
                         if (this._options.Decision.Invoke(current))

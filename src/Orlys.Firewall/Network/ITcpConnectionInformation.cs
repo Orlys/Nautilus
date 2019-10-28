@@ -6,7 +6,7 @@ namespace Orlys.Network
     using System.Net;
     using System.Net.NetworkInformation;
 
-    public interface ITcpConnectionInformation
+    public interface ITcpConnectionInformation : IEquatable<ITcpConnectionInformation>
     {
         TcpState State { get; }
 

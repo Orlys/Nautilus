@@ -8,14 +8,15 @@ namespace Orlys.Firewall.Dev
     using System.Linq;
     using Orlys.PollingServices.Traffic;
     using PollingServices;
+    using Network.ModelBinding;
     internal class Program
     {
         private static void Main(string[] args)
         {
-            var opt = new TrafficOptions(PollingCycle.Fixed(TimeSpan.FromSeconds(1)), x => false);
-            var tr = TrafficPolling.Create(opt);
+            var tr = TrafficPolling.Create(PollingCycle.Fixed(TimeSpan.FromMilliseconds(50)));
 
-            tr.Removed += (sender, e) => Console.WriteLine("Removed: " + e.Value.Local + " | " + Process.GetProcessById(e.Value.Pid).ProcessName);
+            tr.Removed += (sender, e) => Console.WriteLine("Removed: " + e.Value.LocalEndPoint + " | " + e.Value.Bind().ProcessName);
+            tr.Joined += (sender, e) => Console.WriteLine("Joined: " + e.Value.LocalEndPoint + " | " + e.Value.Bind().ProcessName);
 
             _ = tr.PollAsync();
 
@@ -33,37 +34,56 @@ namespace Orlys.PollingServices.Traffic
     using Orlys.Network;
     using System.Net.NetworkInformation;
 
-    public class Traffic
+    public class TcpConnectionInfoEqualityComparer : EqualityComparer<ITcpConnectionInformation>
     {
-        internal Traffic(IPEndPoint local, int pid)
+        public override bool Equals(ITcpConnectionInformation x, ITcpConnectionInformation y)
         {
-            this.Local = local;
-            this.Pid = pid;
+            return x.Equals(y);
         }
-        public IPEndPoint Local { get; }
-        public int Pid { get; }
+        public override int GetHashCode(ITcpConnectionInformation obj)
+        {
+            unchecked
+            {
+                int hash = 17;
+                hash = hash * 23 + obj.LocalEndPoint.GetHashCode();
+                hash = hash * 23 + obj.RemoteEndPoint.GetHashCode();
+                hash = hash * 23 + obj.ProcessIdentifier.GetHashCode();
+                return hash;
+            }
+        }
     }
 
-    public class TrafficOptions : PollingOptions<Traffic>
+    public class TrafficPolling : Polling<ITcpConnectionInformation>
     {
-        public TrafficOptions(PollingCycle cycle, PollingDecision<Traffic> decision) : base(cycle, decision)
+        public static TrafficPolling Create(PollingCycle cycle )
         {
-        }
-    }
+            IEnumerable<ITcpConnectionInformation> fetch()
+            {
+                foreach (var p in Query.Execute(QuerySelectors.IPv4).Concat(Query.Execute(QuerySelectors.IPv6)))
+                {
+                        yield return p;
+                    
+                }
+            }
+            var current = fetch();
 
-    public class TrafficPolling : Polling<Traffic>
-    {
-        public static TrafficPolling Create(TrafficOptions options)
-        {
-            var current = from tcp in Query.Execute(QuerySelectors.IPv4).Concat(Query.Execute(QuerySelectors.IPv6))
-                          where tcp.State == TcpState.Established
-                          select new Traffic(tcp.LocalEndPoint, tcp.ProcessIdentifier);
+            bool decision(ITcpConnectionInformation x)
+            {
+
+                var k = fetch().Contains(x, TcpConnectionInfoEqualityComparer.Default );
+                System.Console.WriteLine(k);
+                return k;
+            }
+
+            var options = new PollingOptions<ITcpConnectionInformation>(cycle, decision);
+            
 
             return new TrafficPolling(options, current);
         }
 
 
-        private TrafficPolling(PollingOptions<Traffic> options, IEnumerable<Traffic> collection) : base(options, collection)
+        private TrafficPolling(PollingOptions<ITcpConnectionInformation> options, IEnumerable<ITcpConnectionInformation> collection)
+            : base(options, collection)
         {
         }
     }
