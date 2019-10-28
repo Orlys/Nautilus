@@ -52,7 +52,7 @@
     <Compile Include="Firewall\Models\RemotePortRange.cs" />
     <Compile Include="Network\ModelBinding\ProcessExtension.cs" />
     <Compile Include="Network\Query.cs" />
-    <Compile Include="Network\Internal\InternalQuerySelector.cs" />
+    <Compile Include="Network\Internal\InternalQuerySelector`2.cs" />
     <Compile Include="Network\Internal\IPv4Row.cs" />
     <Compile Include="Network\Internal\IPv4Table.cs" />
     <Compile Include="Network\Internal\IPv6Row.cs" />
@@ -63,6 +63,10 @@
     <Compile Include="Network\ITcpConnectionInformation.cs" />
     <Compile Include="Network\QuerySelectors.cs" />
     <Compile Include="Network\Utilities\NetworkHelper.cs" />
+    <Compile Include="PollingServices\PollEventArgs`1.cs" />
+    <Compile Include="PollingServices\Polling`1.cs" />
+    <Compile Include="PollingServices\PollingCycle.cs" />
+    <Compile Include="PollingServices\PollingOptions`1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Firewall\Enums\Protocol.cs" />
     <Compile Include="Firewall\Rule.cs" />
