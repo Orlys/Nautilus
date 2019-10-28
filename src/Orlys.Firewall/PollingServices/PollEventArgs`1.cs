@@ -2,9 +2,9 @@
 {
     using System;
 
-    public class PollEventArgs<T> : EventArgs
+    public class PollingEventArgs<T> : EventArgs
     {
-        internal PollEventArgs(T value)
+        internal PollingEventArgs(T value)
         {
             this.Value = value;
         }

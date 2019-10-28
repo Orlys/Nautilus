@@ -27,34 +27,34 @@
             this._options = options;
         }
 
-        public event EventHandler<PollEventArgs<T>> Removed;
+        public event EventHandler<PollingEventArgs<T>> Removed;
 
-        public event EventHandler<PollEventArgs<T>> Joined;
+        public event EventHandler<PollingEventArgs<T>> Joined;
 
-        public event EventHandler<PollEventArgs<T>> Processed;
+        public event EventHandler<PollingEventArgs<T>> Processed;
 
         public virtual bool Join(T value)
         {
             this._queue.Enqueue(value);
-            this.Joined?.Invoke(this, new PollEventArgs<T>(value));
+            this.Joined?.Invoke(this, new PollingEventArgs<T>(value));
             return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void RemoveNotifier(T value)
         {
-            this.Removed?.Invoke(this, new PollEventArgs<T>(value));
+            this.Removed?.Invoke(this, new PollingEventArgs<T>(value));
         }
 
-        protected virtual void OnRemoved(object sender, PollEventArgs<T> e)
+        protected virtual void OnRemoved(object sender, PollingEventArgs<T> e)
         {
         }
 
-        protected virtual void OnJoined(object sender, PollEventArgs<T> e)
+        protected virtual void OnJoined(object sender, PollingEventArgs<T> e)
         {
         }
 
-        protected virtual void OnProcessed(object sender, PollEventArgs<T> e)
+        protected virtual void OnProcessed(object sender, PollingEventArgs<T> e)
         {
         }
 
@@ -74,7 +74,7 @@
                         if (this._options.Decision.Invoke(current))
                         {
                             this._queue.Enqueue(current);
-                            this.Processed?.Invoke(this, new PollEventArgs<T>(current));
+                            this.Processed?.Invoke(this, new PollingEventArgs<T>(current));
                         }
                         else
                             this.RemoveNotifier(current);
