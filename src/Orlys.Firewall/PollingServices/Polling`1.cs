@@ -1,63 +1,88 @@
 ﻿namespace Orlys.PollingServices
 {
     using System;
+    using System.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Runtime.CompilerServices;
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class Polling<T> : IDisposable
+    internal interface IAddMethodHide<T> : IEnumerable<T>
+    {
+        void Add(T item);
+    }
+
+    public class Polling<T> : IReadOnlyCollection<T>, IAddMethodHide<T>, IDisposable
     {
         private readonly ConcurrentQueue<T> _queue;
         private readonly PollingOptions<T> _options;
         private bool _running;
 
-        public Polling(PollingOptions<T> options) : this(options, null)
-        {
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Polling(PollingOptions<T> options, IEnumerable<T> collection)
-        {
-            this._queue = collection is null ? new ConcurrentQueue<T>() : new ConcurrentQueue<T>(collection);
-            this.Removed += this.OnRemoved;
-            this.Joined += this.OnJoined;
-            this.Processed += this.OnProcessed;
+        public Polling(PollingOptions<T> options)
+        { 
+            this._queue = new ConcurrentQueue<T>();
+            this.Detached += this.OnDetached;
+            this.Attached += this.OnAttached;
+            this.Pushbacked += this.OnPushbacked;
             this._options = options;
         }
 
-        public event EventHandler<PollingEventArgs<T>> Removed;
-
-        public event EventHandler<PollingEventArgs<T>> Joined;
-
-        public event EventHandler<PollingEventArgs<T>> Processed;
-
-        public virtual bool Join(T value)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public void Add(T item)
         {
-            this._queue.Enqueue(value);
-            this.Joined?.Invoke(this, new PollingEventArgs<T>(value));
+            this.Attach(item);
+        }
+
+        public event EventHandler<PollingEventArgs<T>> Detached;
+
+        public event EventHandler<PollingEventArgs<T>> Attached;
+
+        public event EventHandler<PollingEventArgs<T>> Pushbacked;
+
+        public virtual bool Attach(T item)
+        {
+            this._queue.Enqueue(item);
+            this.Attached?.Invoke(this, new PollingEventArgs<T>(item));
             return true;
         }
 
+        protected virtual bool Detach(out T item)
+        {
+            var result = this._queue.TryDequeue(out item);
+            if (result)
+            {
+                this.Detached?.Invoke(this, new PollingEventArgs<T>(item));
+            }
+            return result;
+        }
+
+        protected virtual void OnDetached(object sender, PollingEventArgs<T> e)
+        {
+        }
+
+        protected virtual void OnAttached(object sender, PollingEventArgs<T> e)
+        {
+        }
+
+        protected virtual void OnPushbacked(object sender, PollingEventArgs<T> e)
+        {
+        }
+        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void RemoveNotifier(T value)
+        protected virtual void BeforeMoveNext()
         {
-            this.Removed?.Invoke(this, new PollingEventArgs<T>(value));
+
         }
 
-        protected virtual void OnRemoved(object sender, PollingEventArgs<T> e)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool MoveNext(out T item)
         {
+            return this._queue.TryDequeue(out item);
         }
-
-        protected virtual void OnJoined(object sender, PollingEventArgs<T> e)
-        {
-        }
-
-        protected virtual void OnProcessed(object sender, PollingEventArgs<T> e)
-        {
-        }
-
 
         public async Task PollAsync()
         {
@@ -67,16 +92,18 @@
                 var timeSpan = default(TimeSpan);
                 do
                 {
-                    this._options.Cycle.Adjust(this._queue.Count, out timeSpan);
-                    if (this._queue.TryDequeue(out var current))
+                    this._options.Cycle.Adjust(this._queue.Count, out timeSpan);                    
+                    if (this.MoveNext(out var current))
                     {
                         if (this._options.Decision.Invoke(current))
                         {
                             this._queue.Enqueue(current);
-                            this.Processed?.Invoke(this, new PollingEventArgs<T>(current));
+                            this.Pushbacked?.Invoke(this, new PollingEventArgs<T>(current));
                         }
                         else
-                            this.RemoveNotifier(current);
+                            this.Detached?.Invoke(this, new PollingEventArgs<T>(current));
+
+                        this.BeforeMoveNext();
                     }
                 }
                 while (!SpinWait.SpinUntil(() => !this._running, timeSpan));
@@ -94,33 +121,10 @@
             this.Suspend();
         }
 
-        public static Polling<T> operator +(Polling<T> polling, T value)
-        {
-            polling.Join(value);
-            return polling;
-        }
+        public int Count => this._queue.Count;
 
-        public static Polling<T> operator -(Polling<T> polling, T value)
-        {
-            for (int i = 0; i < polling._queue.Count; i++)
-            {
-                if (polling._queue.TryDequeue(out var peek))
-                {
-                    if ((value is IEquatable<T> eq && eq.Equals(peek)) ||
-                        value.Equals(peek) ||
-                        ReferenceEquals(peek, value))
-                    {
-                        polling.RemoveNotifier(peek);
-                        break;
-                    }
-                    else
-                        polling._queue.Enqueue(peek);
-                }
-                else
-                    break;
-            }
-            return polling;
-        }
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => this._queue.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => this._queue.GetEnumerator();
     }
 }
 

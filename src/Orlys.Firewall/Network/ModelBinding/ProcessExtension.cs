@@ -3,13 +3,23 @@
 
 namespace Orlys.Network.ModelBinding
 {
+    using System;
     using System.Diagnostics;
 
     public static class ProcessExtension
     {
-        public static Process Bind(this ITcpConnectionInformation connection)
+        public static bool TryBind(this ITcpConnectionInformation connection, out Process process)
         {
-            return Process.GetProcessById(connection.ProcessIdentifier);
+            try
+            {
+                process = Process.GetProcessById(connection.ProcessIdentifier);
+                return true;
+            }
+            catch(ArgumentException)
+            {
+                process = null;
+                return false;
+            }
         }
     }
 }
