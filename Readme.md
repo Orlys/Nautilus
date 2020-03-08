@@ -31,4 +31,4 @@ await controller.Clear();
 ```
 
 ## License
-[Mozilla Public License 2.0](./LICENSE)
+[Mozilla Public License 2.0](./LICENSE.txt)
