@@ -3,77 +3,50 @@
 
 namespace Nautilus.Windows.Firewall
 {
-    using NetFwTypeLib;
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Text;
-    using System.Threading;
 
     internal class SeparatedList<T> : IList<T>
     {
+        private delegate bool TryParseDelegate(string s, out T result);
+
+        private static TryParseDelegate s_deleCache;
         private readonly List<T> _list;
         private readonly object _lock = new object();
-
-        private delegate bool TryParseDelegate(string s, out T result);
-        private static TryParseDelegate s_deleCache;
-        private static TryParseDelegate GetParser()
-        {
-            if (s_deleCache != null)
-                return s_deleCache;
-
-            var type = typeof(T);
-            var s = Expression.Parameter(typeof(string));
-            var refType = type.MakeByRefType();
-            var result = Expression.Parameter(refType);
-            var tryParseMethod = type.GetMethod("TryParse", BindingFlags.Public | BindingFlags.Static, null, new[] { s.Type, refType }, null);
-
-            if (tryParseMethod == null)
-                throw new MissingMethodException(type.FullName, "TryParse");
-
-            var caller = Expression.Call(tryParseMethod, s, result) as Expression;
-            s_deleCache = Expression.Lambda<TryParseDelegate>(caller, s, result).Compile();
-            return s_deleCache;
-        }
-         
+        private readonly string _separator;
 
         public event EventHandler ListChanged;
 
-        public override string ToString()
+        public int Count
         {
-            return this.Reduce();
-        }
-
-        public string Reduce()
-        {
-            lock (this._lock)
-                return string.Join(this._separator, this);
-        }
-
-        private readonly string _separator;
-
-        public virtual void Add(T value)
-        {
-            lock (this._lock)
+            get
             {
-                this._list.Add(value);
-                this.ListChanged?.Invoke(this, EventArgs.Empty);
+                lock (this._lock)
+                    return _list.Count;
             }
         }
 
-        public virtual bool Remove(T value)
+        public bool IsReadOnly => false;
+
+        public virtual T this[int index]
         {
-            lock (this._lock)
+            get
             {
-                var v = this._list.Remove(value);
-                if(v)
+                lock (this._lock)
+                {
+                    return _list[index];
+                }
+            }
+            set
+            {
+                lock (this._lock)
+                {
+                    _list[index] = value;
                     this.ListChanged?.Invoke(this, EventArgs.Empty);
-                return v;
+                }
             }
         }
 
@@ -91,7 +64,37 @@ namespace Nautilus.Windows.Firewall
             {
                 if (parser(vSeg, out var v))
                     this._list.Add(v);
-            } 
+            }
+        }
+
+        public virtual void Add(T value)
+        {
+            lock (this._lock)
+            {
+                this._list.Add(value);
+                this.ListChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public virtual void Clear()
+        {
+            lock (this._lock)
+            {
+                _list.Clear();
+                this.ListChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        public bool Contains(T item)
+        {
+            lock (this._lock)
+                return _list.Contains(item);
+        }
+
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            lock (this._lock)
+                _list.CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -121,6 +124,23 @@ namespace Nautilus.Windows.Firewall
             }
         }
 
+        public string Reduce()
+        {
+            lock (this._lock)
+                return string.Join(this._separator, this);
+        }
+
+        public virtual bool Remove(T value)
+        {
+            lock (this._lock)
+            {
+                var v = this._list.Remove(value);
+                if (v)
+                    this.ListChanged?.Invoke(this, EventArgs.Empty);
+                return v;
+            }
+        }
+
         public virtual void RemoveAt(int index)
         {
             lock (this._lock)
@@ -130,53 +150,28 @@ namespace Nautilus.Windows.Firewall
             }
         }
 
-        public virtual T this[int index]
+        public override string ToString()
         {
-            get
-            {
-                lock (this._lock)
-                {
-                    return _list[index];
-                }
-            }
-            set
-            {
-                lock (this._lock)
-                {
-                    _list[index] = value;
-                    this.ListChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
-        public virtual void Clear()
-        {
-            lock (this._lock)
-            {
-                _list.Clear();
-                this.ListChanged?.Invoke(this, EventArgs.Empty);
-            }
+            return this.Reduce();
         }
 
-        public bool Contains(T item)
+        private static TryParseDelegate GetParser()
         {
-            lock (this._lock)
-                return _list.Contains(item);
-        }
+            if (s_deleCache != null)
+                return s_deleCache;
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            lock (this._lock)
-                _list.CopyTo(array, arrayIndex);
-        }
+            var type = typeof(T);
+            var s = Expression.Parameter(typeof(string));
+            var refType = type.MakeByRefType();
+            var result = Expression.Parameter(refType);
+            var tryParseMethod = type.GetMethod("TryParse", BindingFlags.Public | BindingFlags.Static, null, new[] { s.Type, refType }, null);
 
-        public int Count
-        {
-            get
-            {
-                lock (this._lock)
-                    return _list.Count;
-            }
+            if (tryParseMethod == null)
+                throw new MissingMethodException(type.FullName, "TryParse");
+
+            var caller = Expression.Call(tryParseMethod, s, result) as Expression;
+            s_deleCache = Expression.Lambda<TryParseDelegate>(caller, s, result).Compile();
+            return s_deleCache;
         }
-        public bool IsReadOnly => false;
     }
 }

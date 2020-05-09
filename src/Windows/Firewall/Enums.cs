@@ -9,7 +9,6 @@ namespace Nautilus.Windows.Firewall
     using System.ComponentModel;
 
     /// <summary>
-    /// 
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public enum SpecificLocalPort
@@ -19,22 +18,20 @@ namespace Nautilus.Windows.Firewall
         IPHTTPS
     }
 
-
-    public enum Actions 
+    public enum Actions
     {
         Block,
         Allow
     }
-     
-    public enum Directions  
-    { 
-        Incoming = 1, 
+
+    public enum Directions
+    {
+        Incoming = 1,
         Outgoing
     }
 
-
     [Flags]
-    public enum InterfaceTypes 
+    public enum InterfaceTypes
     {
         All = RemoteAccess | Wireless | Lan,
         RemoteAccess = 1,
@@ -43,7 +40,7 @@ namespace Nautilus.Windows.Firewall
     }
 
     [Flags]
-    public enum Profiles  
+    public enum Profiles
     {
         All = int.MaxValue,
         Public = 4,
@@ -240,8 +237,8 @@ namespace Nautilus.Windows.Firewall
         /// [The Ethernet, A Local Area Network: Data Link Layer and Physical Layer Specification,
         /// AA-K759B-TK, Digital Equipment Corporation, Maynard, MA. Also as: The Ethernet - A Local
         /// Area Network, Version 1.0, Digital Equipment Corporation, Intel Corporation, Xerox
-        /// Corporation, September 1980. And: The Ethernet, A Local Area Network: Data Link Layer and
-        /// Physical Layer Specifications, Digital, Intel and Xerox, November 1982.
+        /// Corporation, September 1980. And: The Ethernet, A Local Area Network: Data Link Layer
+        /// and Physical Layer Specifications, Digital, Intel and Xerox, November 1982.
         /// And: XEROX, The Ethernet, A Local Area Network: Data Link Layer and Physical Layer
         /// Specification, X3T51/80-50, Xerox Corporation, Stamford, CT., October 1980.][[XEROX]]
         /// </remarks>
@@ -290,7 +287,8 @@ namespace Nautilus.Windows.Firewall
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static ProtocolTypes IRTP => s_protocols[28];
 
-        /// <summary> ISO Transport Protocol Class 4 </summary> <remarks> [RFC905][<mystery contact>] </remarks>
+        /// <summary> ISO Transport Protocol Class 4 </summary> <remarks> [RFC905][<mystery
+        /// contact>] </remarks>
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public static ProtocolTypes ISO_TP4 => s_protocols[29];
 
@@ -1303,7 +1301,8 @@ namespace Nautilus.Windows.Firewall
         {
             return s_protocols[(short)protocol];
         }
-        public static implicit operator SlimProtocolTypes (ProtocolTypes protocol)
+
+        public static implicit operator SlimProtocolTypes(ProtocolTypes protocol)
         {
             return (SlimProtocolTypes)protocol.Value;
         }

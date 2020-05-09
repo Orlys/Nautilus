@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <PackageReference Include="Orlys.Iridium" Version="1.0.1" />
+    <PackageReference Include="System.Security.Principal.Windows" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -7,19 +7,15 @@ namespace Nautilus.Windows.Network
     using System.Net.NetworkInformation;
 
     public interface IEditableTrafficRow
-    { 
-        TcpState State {  set; }
+    {
+        TcpState State { set; }
     }
 
     public interface ITrafficRow : IEquatable<ITrafficRow>, IComparable<ITrafficRow>
     {
-        TcpState State { get;  }
-
         IPEndPoint LocalEndPoint { get; }
-
-        IPEndPoint RemoteEndPoint { get; }
-
         int Pid { get; }
-         
+        IPEndPoint RemoteEndPoint { get; }
+        TcpState State { get; }
     }
 }

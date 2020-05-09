@@ -12,19 +12,10 @@ namespace Nautilus.Windows.Network
         // https://docs.microsoft.com/zh-tw/windows/win32/api/iprtrmib/ne-iprtrmib-tcp_table_class
         private const int TCP_TABLE_OWNER_PID_ALL = 5;
 
-        [DllImport("iphlpapi.dll", SetLastError = true)]
-        private static extern uint GetExtendedTcpTable(
-            IntPtr tcpTable,
-            ref int tcpTableLength,
-            bool sort,
-            AddressFamily ipVersion,
-            int tcpTableType = TCP_TABLE_OWNER_PID_ALL,
-            int reserved = 0);
-
         /// <summary>
-        ///
         /// </summary>
-        /// <param name="queryBuilder"> Using <see cref="QueryBy.IPv4"/> or <see cref="QueryBy.IPv6"/> to query tcp status.
+        /// <param name="queryBuilder">
+        /// Using <see cref="QueryBy.IPv4"/> or <see cref="QueryBy.IPv6"/> to query tcp status.
         /// </param>
         /// <returns></returns>
         public static IReadOnlyList<ITrafficRow> Execute(IRowAdapter queryBuilder)
@@ -33,9 +24,9 @@ namespace Nautilus.Windows.Network
         }
 
         /// <summary>
-        ///
         /// </summary>
-        /// <param name="queryBuilder"> Using <see cref="QueryBy.IPv4"/> or <see cref="QueryBy.IPv6"/> to query tcp status.
+        /// <param name="queryBuilder">
+        /// Using <see cref="QueryBy.IPv4"/> or <see cref="QueryBy.IPv6"/> to query tcp status.
         /// </param>
         /// <param name="filter"></param>
         /// <returns></returns>
@@ -86,5 +77,14 @@ namespace Nautilus.Windows.Network
             }
             return result;
         }
+
+        [DllImport("iphlpapi.dll", SetLastError = true)]
+        private static extern uint GetExtendedTcpTable(
+            IntPtr tcpTable,
+            ref int tcpTableLength,
+            bool sort,
+            AddressFamily ipVersion,
+            int tcpTableType = TCP_TABLE_OWNER_PID_ALL,
+            int reserved = 0);
     }
 }

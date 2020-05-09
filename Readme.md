@@ -2,9 +2,10 @@
 Fully-asynchronous programmable dynamic firewall API for Windows platform written in C#.
 
 ## Usage
-Dynamic firewall APIs example.
+Dynamic firewall API examples.
 ```csharp
-using Nautilus.Windows.Firewall;
+// required COM+ component 'NetFwTypeLib' and admin permission.
+using Nautilus.Windows.Firewall; 
 
 // gets firewall controller. (singleton)
 var controller = Firewall.Controller;

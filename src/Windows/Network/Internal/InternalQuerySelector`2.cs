@@ -1,4 +1,4 @@
-﻿// Author: Orlys
+﻿/// Author: Orlys
 // Github: https://github.com/Orlys
 namespace Nautilus.Windows.Network.Internal
 {
@@ -13,16 +13,13 @@ namespace Nautilus.Windows.Network.Internal
     internal sealed class QuerySelectorBinder<TTable, TRow> : IRowAdapter
         where TRow : IRowAdaptable
     {
-        public int RowSize { get; }
-        public AddressFamily AddressFamily { get; }
-        public Type TableType { get; }
-        public Type RowType { get; }
-
-        public Func<IntPtr, uint> CalculateEntries { get; }
-
-        public Func<IntPtr, ITrafficRow> Adapt { get; }
-
         private static readonly Type[] s_signture = { typeof(IntPtr), typeof(Type) };
+        public Func<IntPtr, ITrafficRow> Adapt { get; }
+        public AddressFamily AddressFamily { get; }
+        public Func<IntPtr, uint> CalculateEntries { get; }
+        public int RowSize { get; }
+        public Type RowType { get; }
+        public Type TableType { get; }
 
         internal QuerySelectorBinder(AddressFamily family)
         {

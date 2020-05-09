@@ -1,23 +1,26 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
 
 namespace Nautilus.Windows.Firewall
 {
     using Iridium.Callee;
+
     using NetFwTypeLib;
 
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
 
     internal sealed class FirewallController : IFirewallController
     {
-        private readonly string _productName;
         private readonly INetFwPolicy2 _netFwPolicy2;
+        private readonly string _productName;
         private readonly ConcurrentDictionary<Guid, IFirewallRule> _rules;
+        public IEnumerable<IFirewallRule> Rules => this._rules.Values;
+
         internal FirewallController()
         {
             CalleeChecker.Allow(typeof(Firewall));
@@ -28,7 +31,6 @@ namespace Nautilus.Windows.Firewall
 
             foreach (INetFwRule rule in this._netFwPolicy2.Rules)
             {
-
                 if (!string.Equals(this._productName, rule.Grouping))
                     continue;
 
@@ -39,8 +41,6 @@ namespace Nautilus.Windows.Firewall
                 }
             }
         }
-
-        public IEnumerable<IFirewallRule> Rules => this._rules.Values;
 
         public Task Clear()
         {
@@ -61,12 +61,12 @@ namespace Nautilus.Windows.Firewall
             lock (this._netFwPolicy2)
             {
                 IFirewallRule fwRule = FirewallRule.Create(this._productName, out var netFwRule);
-                fwRule.Protocol = ProtocolTypes.TCP; 
+                fwRule.Protocol = ProtocolTypes.TCP;
                 this._netFwPolicy2.Rules.Add(netFwRule);
                 this._rules.TryAdd(fwRule.Id, fwRule);
                 return Task.FromResult(fwRule);
             }
-        } 
+        }
 
         public Task<bool> Delete(Guid id)
         {
@@ -80,4 +80,3 @@ namespace Nautilus.Windows.Firewall
         }
     }
 }
-

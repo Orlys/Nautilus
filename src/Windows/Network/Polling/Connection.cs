@@ -1,5 +1,5 @@
-﻿
-
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
 
 namespace Nautilus.Windows.Network.Polling
 {
@@ -7,6 +7,7 @@ namespace Nautilus.Windows.Network.Polling
     {
         private readonly static object s_lock = new object();
         private static volatile ConnectionWatcher s_instance;
+
         public static IConnectionWatcher Watcher
         {
             get
@@ -24,6 +25,5 @@ namespace Nautilus.Windows.Network.Polling
                 return s_instance;
             }
         }
-        
     }
 }

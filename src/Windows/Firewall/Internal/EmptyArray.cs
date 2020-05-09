@@ -1,4 +1,5 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
 
 namespace Nautilus.Windows.Firewall
 {
@@ -7,4 +8,3 @@ namespace Nautilus.Windows.Firewall
         internal static readonly T[] Default = new T[0];
     }
 }
-

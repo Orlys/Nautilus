@@ -1,65 +1,56 @@
-﻿//
-// derived from https://github.com/jsakamoto/ipaddressrange/
-// which as of March 2020 was using mozilla public license (MPL-2.0)
-//
+﻿// derived from https://github.com/jsakamoto/ipaddressrange/ which as of March 2020 was using
+// mozilla public license (MPL-2.0)
 
 namespace Nautilus.Windows.Firewall
 {
     using System;
-    using System.Linq;
     using System.Collections;
     using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Linq;
     using System.Net;
     using System.Text.RegularExpressions;
-    using System.ComponentModel;
 
-    // NOTE: Why implement IReadOnlyDictionary<TKey,TVal> interface? 
-    // =============================================================
-    // Problem
-    // ----------
-    // An IPAddressRange after v.1.4 object cann't serialize to/deserialize from JSON text by using JSON.NET.
+    // NOTE: Why implement IReadOnlyDictionary<TKey,TVal> interface?
+    // ============================================================= Problem ---------- An
+    // IPAddressRange after v.1.4 object cann't serialize to/deserialize from JSON text by using JSON.NET.
     //
-    // Details
-    // ----------
-    // JSON.NET detect IEnumerable<IPAddress> interface prior to ISerializable. 
-    // At a result, JSON.NET try to serialize IPAddressRange as array, such as "["192.168.0.1", "192.168.0.2"]".
-    // This is unexpected behavior. (We expect "{"Begin":"192.168.0.1", "End:"192.168.0.2"}" style JSON text that is same with DataContractJsonSerializer.)
-    // In addition, JSON serialization with JSON.NET crash due to IPAddress cann't serialize by JSON.NET.
+    // Details ---------- JSON.NET detect IEnumerable<IPAddress> interface prior to ISerializable.
+    // At a result, JSON.NET try to serialize IPAddressRange as array, such as "["192.168.0.1",
+    // "192.168.0.2"]". This is unexpected behavior. (We expect "{"Begin":"192.168.0.1",
+    // "End:"192.168.0.2"}" style JSON text that is same with DataContractJsonSerializer.) In
+    // addition, JSON serialization with JSON.NET crash due to IPAddress cann't serialize by JSON.NET.
     //
-    // Work around
-    // -----------
-    // To avoid this JSON.NET behavior, IPAddressRange should implement more high priority interface than IEnumerable<T> in JSON.NET.
-    // Such interfaces include the following.
+    // Work around ----------- To avoid this JSON.NET behavior, IPAddressRange should implement more
+    // high priority interface than IEnumerable<T> in JSON.NET. Such interfaces include the following.
     // - IDictionary
     // - IDictionary<TKey,TVal>
-    // - IReadOnlyDictionary<TKey,TVal>
-    // But, when IPAddressRange implement IDictionay or IDictionary<TKey,TVal>, serialization by DataContractJsonSerializer was broken.
+    // - IReadOnlyDictionary<TKey,TVal> But, when IPAddressRange implement IDictionay or
+    // IDictionary<TKey,TVal>, serialization by DataContractJsonSerializer was broken.
     // (Implementation of DataContractJsonSerializer is special for IDictionay and IDictionary<TKey,TVal>)
-    // 
+    //
     // So there is no way without implement IReadOnlyDictionary<TKey,TVal>.
     //
-    // Trade off
-    // -------------
-    // IReadOnlyDictionary<TKey,TVal> interface doesn't exist in .NET Framework v.4.0 or before.
-    // In order to give priority to supporting serialization by JSON.NET, I had to truncate the support for .NET Framework 4.0.
-    // (.NET Standard 1.4 support IReadOnlyDictionary<TKey,TVal>, therefore there is no problem on .NET Core appliction.)
-    // 
-    // Binary level compatiblity
-    // -------------------------
-    // There is no problem even if IPAddressRange.dll is replaced with the latest version.
-    // 
-    // Source code level compatiblity
-    // -------------------------
-    // You cann't apply LINQ extension methods directory to IPAddressRange object.
-    // Because IPAddressRange implement two types of IEnumerable<T> (IEnumerable<IPaddress> and IEnumerable<KeyValuePair<K,V>>).
-    // It cause ambiguous syntax error.
-    // To avoid this error, you should use "AsEnumerable()" method before IEnumerable<IPAddressRange> access.
+    // Trade off ------------- IReadOnlyDictionary<TKey,TVal> interface doesn't exist in .NET
+    // Framework v.4.0 or before. In order to give priority to supporting serialization by JSON.NET,
+    // I had to truncate the support for .NET Framework 4.0. (.NET Standard 1.4 support
+    // IReadOnlyDictionary<TKey,TVal>, therefore there is no problem on .NET Core appliction.)
+    //
+    // Binary level compatiblity ------------------------- There is no problem even if
+    // IPAddressRange.dll is replaced with the latest version.
+    //
+    // Source code level compatiblity ------------------------- You cann't apply LINQ extension
+    // methods directory to IPAddressRange object. Because IPAddressRange implement two types of
+    // IEnumerable<T> (IEnumerable<IPaddress> and IEnumerable<KeyValuePair<K,V>>). It cause
+    // ambiguous syntax error. To avoid this error, you should use "AsEnumerable()" method before
+    // IEnumerable<IPAddressRange> access.
 
 #if NET45
     [Serializable]
     using System.Runtime.Serialization;
     public class IPAddressRange : ISerializable, IEnumerable<IPAddress>, IReadOnlyDictionary<string, string>, IEquatable<IPAddressRange>, IFixedRange<IPAddress>
 #else
+
     public class IPAddressRange : IEnumerable<IPAddress>, IReadOnlyDictionary<string, string>, IEquatable<IPAddressRange>, IFixedRange<IPAddress>
 #endif
     {
@@ -69,8 +60,8 @@ namespace Nautilus.Windows.Firewall
         // Pattern 2. Uni address: "127.0.0.1", "::1%eth0"
         private readonly static Regex m2_regex = new Regex(@"^(?<adr>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
-        // Pattern 3. Begin end range: "169.254.0.0-169.254.0.255", "fe80::1%23-fe80::ff%23"
-        //            also shortcut notation: "192.168.1.1-7" (IPv4 only)
+        // Pattern 3. Begin end range: "169.254.0.0-169.254.0.255", "fe80::1%23-fe80::ff%23" also
+        // shortcut notation: "192.168.1.1-7" (IPv4 only)
         private readonly static Regex m3_regex = new Regex(@"^(?<begin>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))[ \t]*[\-–][ \t]*(?<end>([\d.]+)|([\da-f:]+(:[\d.]+)?(%\w+)?))$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         // Pattern 4. Bit mask range: "192.168.0.0/255.255.255.0"
@@ -98,9 +89,8 @@ namespace Nautilus.Windows.Firewall
         }
 
         /// <summary>
-        /// Create a new range from a begin and end address.
-        /// Throws an exception if Begin comes after End, or the
-        /// addresses are not in the same family.
+        /// Create a new range from a begin and end address. Throws an exception if Begin comes
+        /// after End, or the addresses are not in the same family.
         /// </summary>
         public IPAddressRange(IPAddress begin, IPAddress end)
         {
@@ -121,9 +111,8 @@ namespace Nautilus.Windows.Firewall
         }
 
         /// <summary>
-        /// Creates a range from a base address and mask bits.
-        /// This can also be used with <see cref="SubnetMaskLength"/> to create a
-        /// range based on a subnet mask.
+        /// Creates a range from a base address and mask bits. This can also be used with <see
+        /// cref="SubnetMaskLength"/> to create a range based on a subnet mask.
         /// </summary>
         /// <param name="baseAddress"></param>
         /// <param name="maskLength"></param>
@@ -182,7 +171,7 @@ namespace Nautilus.Windows.Firewall
             var offset = 0;
             if (Begin.IsIPv4MappedToIPv6 && ipaddress.IsIPv4MappedToIPv6)
             {
-                offset = 12; //ipv4 has prefix of 10 zero bytes and two 255 bytes. 
+                offset = 12; //ipv4 has prefix of 10 zero bytes and two 255 bytes.
             }
 
             var adrBytes = ipaddress.GetAddressBytes();
@@ -199,7 +188,7 @@ namespace Nautilus.Windows.Firewall
             var offset = 0;
             if (Begin.IsIPv4MappedToIPv6 && range.Begin.IsIPv4MappedToIPv6)
             {
-                offset = 12; //ipv4 has prefix of 10 zero bytes and two 255 bytes. 
+                offset = 12; //ipv4 has prefix of 10 zero bytes and two 255 bytes.
             }
 
             return
@@ -240,8 +229,9 @@ namespace Nautilus.Windows.Firewall
             var m3 = m3_regex.Match(ipRangeString);
             if (m3.Success)
             {
-                // if the left part contains dot, but the right one does not, we treat it as a shortuct notation
-                // and simply copy the part before last dot from the left part as the prefix to the right one
+                // if the left part contains dot, but the right one does not, we treat it as a
+                // shortuct notation and simply copy the part before last dot from the left part as
+                // the prefix to the right one
                 var begin = m3.Groups["begin"].Value;
                 var end = m3.Groups["end"].Value;
                 if (begin.Contains('.') && !end.Contains('.'))
@@ -284,9 +274,11 @@ namespace Nautilus.Windows.Firewall
                         case 0x00:
                             if (bit != 0x00) throw new FormatException("The subnet mask is not linear.");
                             break;
+
                         case 0x80:
                             if (bit == 0x00) f = 0x00;
                             break;
+
                         default: throw new Exception();
                     }
                     maskByte <<= 1;
@@ -338,8 +330,8 @@ namespace Nautilus.Windows.Firewall
         }
 
         /// <summary>
-        /// Returns the range in the format "begin-end", or 
-        /// as a single address if End is the same as Begin.
+        /// Returns the range in the format "begin-end", or as a single address if End is the same
+        /// as Begin.
         /// </summary>
         /// <returns></returns>
         public override string ToString()
@@ -449,8 +441,7 @@ namespace Nautilus.Windows.Firewall
 
         IEnumerator<KeyValuePair<string, string>> IEnumerable<KeyValuePair<string, string>>.GetEnumerator() => GetDictionaryItems().GetEnumerator();
 
-        #endregion
-
+        #endregion JSON.NET Support by implement IReadOnlyDictionary<string, string>
 
         public static implicit operator IPAddressRange(IPAddress singleAddress)
         {
@@ -492,14 +483,14 @@ namespace Nautilus.Windows.Firewall
                 //return A.Zip(B, (a, b) => (byte)(a | b)).ToArray();
             }
 
-            // DON'T FIX this non-intuitive behavior that returns true when A <= B, 
-            // even if the method name means "A is Greater than or Equals B", for keeping backward compatibility.
-            // Fixed verison is in "NetTools.Internal" namespace "Bits" class.
+            // DON'T FIX this non-intuitive behavior that returns true when A <= B, even if the
+            // method name means "A is Greater than or Equals B", for keeping backward
+            // compatibility. Fixed verison is in "NetTools.Internal" namespace "Bits" class.
             [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This method returns true when A<=B, not A is greater than or equal (>=) B. use LtE method to check A<=B or not.")]
             public static bool GE(byte[] A, byte[] B) => LtE(A, B);
 
-            // DON'T FIX this non-intuitive behavior that returns true when A >= B, 
-            // even if the method name means "A is Less than or Equals B", for keeping backward compatibility.
+            // DON'T FIX this non-intuitive behavior that returns true when A >= B, even if the
+            // method name means "A is Less than or Equals B", for keeping backward compatibility.
             // Fixed verison is in "NetTools.Internal" namespace "Bits" class.
             [EditorBrowsable(EditorBrowsableState.Never), Obsolete("This method returns true when A>=B, not A is less than or equal (<=) B. use GtE method to check A>=B or not.")]
             public static bool LE(byte[] A, byte[] B) => GtE(A, B);
@@ -567,8 +558,7 @@ namespace Nautilus.Windows.Firewall
             }
 
             /// <summary>
-            /// Counts the number of leading 1's in a bitmask.
-            /// Returns null if value is invalid as a bitmask.
+            /// Counts the number of leading 1's in a bitmask. Returns null if value is invalid as a bitmask.
             /// </summary>
             /// <param name="bytes"></param>
             /// <returns></returns>
@@ -603,7 +593,6 @@ namespace Nautilus.Windows.Firewall
                 }
                 return bitLength;
             }
-
 
             public static byte[] Increment(byte[] bytes)
             {
@@ -640,7 +629,7 @@ namespace Nautilus.Windows.Firewall
                 }
 
                 return result;
-            } 
+            }
         }
     }
 }

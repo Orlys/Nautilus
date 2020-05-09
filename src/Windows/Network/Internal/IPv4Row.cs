@@ -3,7 +3,6 @@
 namespace Nautilus.Windows.Network.Internal
 {
     using System;
-    using System.ComponentModel;
     using System.Net;
     using System.Runtime.InteropServices;
 
@@ -17,7 +16,7 @@ namespace Nautilus.Windows.Network.Internal
 
         private byte _localPort1;
         private byte _localPort0;
-         
+
         [Obsolete("unused field", true)]
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
         private byte[] __localPortDummy;

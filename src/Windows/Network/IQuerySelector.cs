@@ -10,7 +10,7 @@ namespace Nautilus.Windows.Network
     public interface IRowAdapter
     {
         [EditorBrowsable(EditorBrowsableState.Never)]
-        int RowSize { get; }
+        Func<IntPtr, ITrafficRow> Adapt { get; }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         AddressFamily AddressFamily { get; }
@@ -19,6 +19,6 @@ namespace Nautilus.Windows.Network
         Func<IntPtr, uint> CalculateEntries { get; }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        Func<IntPtr, ITrafficRow> Adapt { get; }
+        int RowSize { get; }
     }
 }

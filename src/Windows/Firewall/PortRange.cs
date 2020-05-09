@@ -6,38 +6,24 @@ namespace Nautilus.Windows.Firewall
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics;
 
     /// <summary>
-    /// Port range. This class supported implicit cast from <see cref="Range"/>, 
-    /// <see langword="string"/> and <see langword="ushort"/> types.
+    /// Port range. This class supported implicit cast from <see cref="Range"/>, <see
+    /// langword="string"/> and <see langword="ushort"/> types.
     /// </summary>
     [Summary("Port range. This class supported implicit cast from 'Range', 'string' and 'ushort' types.")]
     public class PortRange : IFixedRange<ushort>, IEquatable<PortRange>
-    { 
-        public ushort Begin { get; } 
-        public ushort End { get; }
-         
+    {
         private readonly bool _isSinglePort;
-        
         private readonly SpecificLocalPort? _specificLocalPort;
+        public ushort Begin { get; }
+        public ushort End { get; }
 
         [EditorBrowsable(EditorBrowsableState.Advanced)]
         public PortRange(SpecificLocalPort specificLocalPort)
         {
             this._specificLocalPort = specificLocalPort;
         }
-
-        public static implicit operator PortRange(Range range)
-        {
-            if (range.Start.Value < 0 || range.Start.Value > 65535)
-                throw new ArgumentOutOfRangeException(nameof(range.Start));
-
-            if (range.End.Value < 0 || range.End.Value > 65535)
-                throw new ArgumentOutOfRangeException(nameof(range.End));
-
-            return new PortRange((ushort)range.Start.Value, (ushort)range.End.Value);
-        } 
 
         public PortRange(ushort first, ushort second)
         {
@@ -59,55 +45,28 @@ namespace Nautilus.Windows.Firewall
         {
         }
 
-
-        public bool Contains(ushort port)
+        public static explicit operator PortRange(string str)
         {
-            if (this._specificLocalPort.HasValue)
-                return false;
-
-            if (this._isSinglePort)
-            {
-                return port == this.Begin;
-            }
-            return this.Begin <= port && this.End >= port;
+            if (TryParse(str, out var v))
+                return v;
+            throw new FormatException();
         }
 
-        public bool Contains(PortRange range)
+        public static implicit operator PortRange(Range range)
         {
-            if (this._specificLocalPort.HasValue)
-                return this.Equals(range);
+            if (range.Start.Value < 0 || range.Start.Value > 65535)
+                throw new ArgumentOutOfRangeException(nameof(range.Start));
 
-            if (range._isSinglePort)
-            {
-                return range.Begin == this.Begin;
-            }
-            return this.Begin <= range.Begin && this.End >= range.End;
+            if (range.End.Value < 0 || range.End.Value > 65535)
+                throw new ArgumentOutOfRangeException(nameof(range.End));
+
+            return new PortRange((ushort)range.Start.Value, (ushort)range.End.Value);
         }
 
-        public override string ToString()
+        public static implicit operator PortRange(ushort port)
         {
-            if (this._specificLocalPort.HasValue)
-                return this._specificLocalPort.ToString();
-
-            if (this._isSinglePort)
-                return this.Begin.ToString();
-
-            return string.Format("{0}-{1}", this.Begin, this.End);
+            return new PortRange(port);
         }
-       
-
-        private static bool TryParseSpecificLocalPort(string value, out SpecificLocalPort? specific)
-        {
-            switch (value)
-            {
-                case "RPC": specific = SpecificLocalPort.RPC; return true;
-                case "RPC-EPMap": specific = SpecificLocalPort.RPC_EPMap; return true;
-                case "IPHTTPS": specific = SpecificLocalPort.IPHTTPS; return true;
-
-                default: specific = null; return false;
-            }
-        }
-
 
         public static bool TryParse(string rangeString, out PortRange range)
         {
@@ -163,11 +122,47 @@ namespace Nautilus.Windows.Firewall
             return true;
         }
 
+        public bool Contains(ushort port)
+        {
+            if (this._specificLocalPort.HasValue)
+                return false;
+
+            if (this._isSinglePort)
+            {
+                return port == this.Begin;
+            }
+            return this.Begin <= port && this.End >= port;
+        }
+
+        public bool Contains(PortRange range)
+        {
+            if (this._specificLocalPort.HasValue)
+                return this.Equals(range);
+
+            if (range._isSinglePort)
+            {
+                return range.Begin == this.Begin;
+            }
+            return this.Begin <= range.Begin && this.End >= range.End;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as PortRange);
+        }
+
+        public bool Equals(PortRange range)
+        {
+            if (this._specificLocalPort.HasValue)
+                return this._specificLocalPort.Equals(range._specificLocalPort);
+
+            return this.GetHashCode() == range.GetHashCode();
+        }
 
         public IEnumerator<ushort> GetEnumerator()
         {
             if (this._specificLocalPort.HasValue)
-                yield break; 
+                yield break;
 
             if (this._isSinglePort)
             {
@@ -185,29 +180,27 @@ namespace Nautilus.Windows.Firewall
             return this.ToString().GetHashCode();
         }
 
-        public override bool Equals(object obj)
-        {
-            return this.Equals(obj as PortRange);
-        }
-
-        public bool Equals(PortRange range)
+        public override string ToString()
         {
             if (this._specificLocalPort.HasValue)
-                return this._specificLocalPort.Equals(range._specificLocalPort);
+                return this._specificLocalPort.ToString();
 
-            return this.GetHashCode() == range.GetHashCode();
+            if (this._isSinglePort)
+                return this.Begin.ToString();
+
+            return string.Format("{0}-{1}", this.Begin, this.End);
         }
 
-        public static explicit operator PortRange(string str)
+        private static bool TryParseSpecificLocalPort(string value, out SpecificLocalPort? specific)
         {
-            if (TryParse(str, out var v))
-                return v;
-            throw new FormatException();
-        }
+            switch (value)
+            {
+                case "RPC": specific = SpecificLocalPort.RPC; return true;
+                case "RPC-EPMap": specific = SpecificLocalPort.RPC_EPMap; return true;
+                case "IPHTTPS": specific = SpecificLocalPort.IPHTTPS; return true;
 
-        public static implicit operator PortRange(ushort port)
-        {
-            return new PortRange(port);
+                default: specific = null; return false;
+            }
         }
     }
 }

@@ -11,6 +11,14 @@ namespace Nautilus.Windows.Network.Internal
 
     internal sealed class RowAdapter : ITrafficRow, IEditableTrafficRow
     {
+        public IPEndPoint LocalEndPoint { get; }
+
+        public int Pid { get; }
+
+        public IPEndPoint RemoteEndPoint { get; }
+
+        public TcpState State { get; set; }
+
         internal RowAdapter(IPEndPoint local, IPEndPoint remote, uint state, uint owningPid)
         {
             this.LocalEndPoint = local;
@@ -19,30 +27,24 @@ namespace Nautilus.Windows.Network.Internal
             this.Pid = (int)owningPid;
         }
 
-        public TcpState State { get; set; }
-
-        public IPEndPoint LocalEndPoint { get; }
-
-        public IPEndPoint RemoteEndPoint { get; }
-
-        public int Pid { get; }
+        public int CompareTo([AllowNull] ITrafficRow other)
+        {
+            return this.State - other.State;
+        }
 
         public override bool Equals(object obj)
         {
             return this.Equals(obj as ITrafficRow);
         }
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(this.LocalEndPoint, this.RemoteEndPoint, this.Pid);
-        }
 
-        public int CompareTo([AllowNull] ITrafficRow other)
-        {
-            return this.State - other.State;
-        }
         public bool Equals([AllowNull] ITrafficRow other)
         {
             return this.GetHashCode().Equals(other.GetHashCode());
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(this.LocalEndPoint, this.RemoteEndPoint, this.Pid);
         }
     }
 }

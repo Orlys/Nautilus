@@ -1,8 +1,8 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
 
 namespace Nautilus.Windows.Firewall
 {
-
     using System;
     using System.Linq;
     using System.Runtime.CompilerServices;
@@ -18,4 +18,3 @@ namespace Nautilus.Windows.Firewall
         }
     }
 }
-

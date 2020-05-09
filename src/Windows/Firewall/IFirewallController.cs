@@ -1,10 +1,12 @@
-﻿
+﻿// Author: Orlys
+// Github: https://github.com/Orlys
+
 namespace Nautilus.Windows.Firewall
 {
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-     
+
     public interface IFirewallController
     {
         /// <summary>
@@ -25,13 +27,13 @@ namespace Nautilus.Windows.Firewall
         /// </summary>
         /// <returns></returns>
         [Summary("Creates a new firewall rule.")]
-        Task<IFirewallRule > Create();
+        Task<IFirewallRule> Create();
 
         /// <summary>
         /// Deletes the firewall rule by <see cref="IFirewallRule.Id"/>.
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns> 
+        /// <returns></returns>
         [Summary("Deletes the firewall rule by 'IFirewallRule.Id'.")]
         Task<bool> Delete([Summary("IFirewallRule's Id property.")]Guid id);
     }
