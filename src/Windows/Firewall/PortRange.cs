@@ -7,8 +7,12 @@ namespace Nautilus.Windows.Firewall
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
-     
 
+    /// <summary>
+    /// Port range. This class supported implicit cast from <see cref="Range"/>, 
+    /// <see langword="string"/> and <see langword="ushort"/> types.
+    /// </summary>
+    [Summary("Port range. This class supported implicit cast from 'Range', 'string' and 'ushort' types.")]
     public class PortRange : IFixedRange<ushort>, IEquatable<PortRange>
     { 
         public ushort Begin { get; } 

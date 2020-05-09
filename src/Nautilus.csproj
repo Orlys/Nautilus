@@ -8,14 +8,16 @@
     <Version>1.0.1</Version>
     <Description>Fully-asynchronous programmable dynamic firewall API for Windows platform written in C#.</Description>
     <Authors>Orlys</Authors>
-    <Company>Nautilus</Company>
+    <Company>Orlys</Company>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageProjectUrl></PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Orlys/Nautilus</PackageProjectUrl>
     <PackageTags>NetFwTypeLib;Windows Firewall;Firewall;.Net Core</PackageTags>
     <RepositoryUrl>https://github.com/Orlys/Nautilus</RepositoryUrl>
     <Copyright>Copyright © 2020 Orlys Ma</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageId>Orlys.Nautilus</PackageId>
+    <Product>Orlys.Nautilus</Product>
   </PropertyGroup>
 
   <ItemGroup>

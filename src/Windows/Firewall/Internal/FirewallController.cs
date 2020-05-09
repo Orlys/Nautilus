@@ -61,6 +61,7 @@ namespace Nautilus.Windows.Firewall
             lock (this._netFwPolicy2)
             {
                 IFirewallRule fwRule = FirewallRule.Create(this._productName, out var netFwRule);
+                fwRule.Protocol = ProtocolTypes.TCP; 
                 this._netFwPolicy2.Rules.Add(netFwRule);
                 this._rules.TryAdd(fwRule.Id, fwRule);
                 return Task.FromResult(fwRule);
