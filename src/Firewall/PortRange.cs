@@ -1,17 +1,19 @@
 ﻿// Author: Orlys
 // Github: https://github.com/Orlys
 
-namespace Nautilus.Windows.Firewall
+namespace Nautilus
 {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Net;
+    using System.Runtime.Serialization;
 
     /// <summary>
     /// Port range. This class supported implicit cast from <see cref="Range"/>, <see
     /// langword="string"/> and <see langword="ushort"/> types.
     /// </summary>
-    [Summary("Port range. This class supported implicit cast from 'Range', 'string' and 'ushort' types.")]
+    [Serializable]
     public class PortRange : IFixedRange<ushort>, IEquatable<PortRange>
     {
         private readonly bool _isSinglePort;
@@ -19,7 +21,29 @@ namespace Nautilus.Windows.Firewall
         public ushort Begin { get; }
         public ushort End { get; }
 
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected PortRange(SerializationInfo info, StreamingContext context)
+        {
+            var names = new List<string>();
+            foreach (var item in info) names.Add(item.Name);
+
+            Func<string, ushort> deserialize = (name) => names.Contains(name) ?
+                 ushort.Parse(info.GetValue(name, typeof(object)).ToString()) :
+                 (ushort)0;
+
+            this.Begin = deserialize("Begin");
+            this.End = deserialize("End");
+        }
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null) throw new ArgumentNullException(nameof(info));
+
+            info.AddValue("Begin", this.Begin.ToString());
+            info.AddValue("End", this.End.ToString());
+        }
+
+
         public PortRange(SpecificLocalPort specificLocalPort)
         {
             this._specificLocalPort = specificLocalPort;

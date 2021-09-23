@@ -1,17 +1,16 @@
 ## Nautilus
-Fully-asynchronous programmable dynamic firewall API for Windows platform written in C#.
+Dynamic firewall API for Windows platform written in C#.
 
 ## Usage
-Dynamic firewall API examples.
 ```csharp
 // required COM+ component 'NetFwTypeLib' and admin permission.
-using Nautilus.Windows.Firewall; 
+using Nautilus; 
 
-// gets firewall controller. (singleton)
-var controller = Firewall.Controller;
+// Gets the firewall service from advance firewall rule list.
+var service = Firewall.GetService("service name in fw panel");
 
 // creates a new firewall rule.
-IFirewallRule newRule = await controller.Create();
+IFirewallRule newRule = service.Create();
 // updates firewall properties.
 newRule.Enabled = true;
 newRule.Direction = Directions.Incoming;
@@ -22,13 +21,13 @@ newRule.RemoteAddresses.Add(IPAddressRange.Parse("173.245.48.0/20"));
 newRule.RemoteAddresses.Add(IPAddress.Parse("1.1.1.1"));
 
 // gets the firewall rules.
-IEnumerable<IFirewallRule> rules = controller.Rules;
+IEnumerable<IFirewallRule> rules = service.Rules;
 
 // deletes a firewall rule.
-await controller.Delete(rule.Id);
+service.Delete(rule.Id);
 
 // removes all firewall rules.
-await controller.Clear();
+service.Clear();
 ```
 
 ## License

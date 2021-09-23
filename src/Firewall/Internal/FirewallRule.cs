@@ -1,9 +1,8 @@
 ﻿// Author: Orlys
 // Github: https://github.com/Orlys
 
-namespace Nautilus.Windows.Firewall
+namespace Nautilus
 {
-    using Iridium.Callee;
 
     using NetFwTypeLib;
 
@@ -53,7 +52,7 @@ namespace Nautilus.Windows.Firewall
 
         public InterfaceTypes InterfaceTypes
         {
-            get => Enum.Parse<InterfaceTypes>(this._rule.InterfaceTypes);
+            get =>  Enum.TryParse<InterfaceTypes>(this._rule.InterfaceTypes, out var @enum) ? @enum : throw new InvalidCastException();
             set => this._rule.InterfaceTypes = EnumHelper<InterfaceTypes>.ValuesToStr(value);
         }
 
@@ -99,13 +98,11 @@ namespace Nautilus.Windows.Firewall
 
         public string ServiceName { get => this._rule.serviceName; set => this._rule.serviceName = value; }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        private FirewallRule(Guid id, INetFwRule rule)
+        internal FirewallRule(Guid id, INetFwRule rule)
         {
-            CalleeChecker.CheckCaller();
-
             this.Id = id;
             this._rule = rule;
+
             this._remotePorts = new SeparatedList<PortRange>(this._rule.RemotePorts, ",");
             this._remotePorts.ListChanged += (sender, e) => this._rule.RemotePorts = sender.ToString();
 
@@ -134,33 +131,5 @@ namespace Nautilus.Windows.Firewall
             return this.Id.GetHashCode();
         }
 
-        internal static FirewallRule Adapt(INetFwRule netFwRule)
-        {
-            CalleeChecker.Allow(typeof(FirewallController));
-
-            if (!Guid.TryParse(netFwRule.Name, out var id))
-            {
-                id = Guid.NewGuid();
-                netFwRule.Description = netFwRule.Name;
-                netFwRule.Name = id.ToString();
-            }
-            return new FirewallRule(id, netFwRule);
-        }
-
-        internal static FirewallRule Create(string groupName, out INetFwRule netFwRule)
-        {
-            CalleeChecker.Allow(typeof(FirewallController));
-
-            netFwRule = CreateNetFwRule();
-            var id = Guid.NewGuid();
-            netFwRule.Name = id.ToString();
-            netFwRule.Grouping = groupName;
-            return new FirewallRule(id, netFwRule);
-        }
-
-        private static INetFwRule CreateNetFwRule()
-        {
-            return (INetFwRule)Activator.CreateInstance(Type.GetTypeFromProgID("HNetCfg.FwRule"));
-        }
     }
 }

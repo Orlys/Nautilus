@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <ApplicationIcon />
     <StartupObject />
     <Version>1.0.1</Version>
@@ -11,7 +10,7 @@
     <Company>Orlys</Company>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/Orlys/Nautilus</PackageProjectUrl>
-    <PackageTags>NetFwTypeLib;Windows Firewall;Firewall;.Net Core</PackageTags>
+    <PackageTags>NetFwTypeLib;Windows Firewall;Firewall</PackageTags>
     <RepositoryUrl>https://github.com/Orlys/Nautilus</RepositoryUrl>
     <Copyright>Copyright © 2020 Orlys Ma</Copyright>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -31,14 +30,11 @@
     </COMReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Orlys.Iridium" Version="1.0.1" />
-    <PackageReference Include="System.Security.Principal.Windows" Version="4.7.0" />
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="..\LICENSE.txt">
       <Pack>True</Pack>
+		<Visible>False</Visible>
       <PackagePath></PackagePath>
     </None>
   </ItemGroup>

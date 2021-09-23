@@ -1,7 +1,7 @@
 ﻿// Author: Orlys
 // Github: https://github.com/Orlys
 
-namespace Nautilus.Windows.Firewall
+namespace Nautilus
 {
     internal static class EmptyArray<T>
     {

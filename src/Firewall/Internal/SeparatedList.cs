@@ -1,19 +1,24 @@
 ﻿// Author: Orlys
 // Github: https://github.com/Orlys
 
-namespace Nautilus.Windows.Firewall
+namespace Nautilus
 {
     using System;
     using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
+
+
 
     internal class SeparatedList<T> : IList<T>
     {
         private delegate bool TryParseDelegate(string s, out T result);
 
         private static TryParseDelegate s_deleCache;
+
+
         private readonly List<T> _list;
         private readonly object _lock = new object();
         private readonly string _separator;
@@ -59,7 +64,7 @@ namespace Nautilus.Windows.Firewall
                 return;
 
             var parser = GetParser();
-            var vSegs = value.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+            var vSegs = value.Split(separator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
             foreach (var vSeg in vSegs)
             {
                 if (parser(vSeg, out var v))

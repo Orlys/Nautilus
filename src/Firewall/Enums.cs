@@ -3,35 +3,34 @@
 
 #pragma warning disable CS0612
 
-namespace Nautilus.Windows.Firewall
+namespace Nautilus
 {
     using System;
     using System.ComponentModel;
 
     /// <summary>
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public enum SpecificLocalPort
+    /// </summary> 
+    public enum SpecificLocalPort : byte
     {
         RPC,
         RPC_EPMap,
         IPHTTPS
     }
 
-    public enum Actions
+    public enum Actions : byte
     {
         Block,
         Allow
     }
 
-    public enum Directions
+    public enum Directions : byte
     {
         Incoming = 1,
         Outgoing
     }
 
     [Flags]
-    public enum InterfaceTypes
+    public enum InterfaceTypes : byte
     {
         All = RemoteAccess | Wireless | Lan,
         RemoteAccess = 1,
