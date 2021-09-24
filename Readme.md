@@ -10,7 +10,7 @@ using Nautilus;
 var service = Firewall.GetService("service name in fw panel"); // type: IFirewallService
 
 // creates a new firewall rule.
-var newRule = service.Create(); // type: IFirewallRule
+var newRule = service.CreateRule(); // type: IFirewallRule
 // updates firewall properties.
 newRule.Enabled = true;
 newRule.Direction = Directions.Incoming;
@@ -20,16 +20,20 @@ newRule.LocalPorts.Add(8009);
 newRule.RemoteAddresses.Add(IPAddressRange.Parse("173.245.48.0/20"));
 newRule.RemoteAddresses.Add(IPAddress.Parse("1.1.1.1"));
 
-service.Update()
+// commits all changes.
+service.UpdateRule(newRule);
 
 // gets the firewall rules.
 var rules = service.Rules; // type: IReadOnlyCollection<IFirewallRule>
 
+// retrieves a firewall rule.
+var singleRule = service.RetrieveRule(newRule.Id);
+
 // deletes a firewall rule.
-service.Delete(rule.Id);
+service.DeleteRule(rule.Id);
 
 // removes all firewall rules.
-service.Clear();
+service.DropRules();
 ```
 
 ## License
