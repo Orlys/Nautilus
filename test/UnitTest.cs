@@ -6,12 +6,12 @@ namespace Nautilus.Tests
 
     public class Tests
     {
-        private IFirewallService _fw;
+        private IFirewallRuleService _fw;
 
         [SetUp]
         public void Setup()
         {
-            this._fw = Firewall.GetService("@__Test");
+            this._fw = Firewall.GetRuleService("@__Test");
         }
 
 
@@ -28,24 +28,24 @@ namespace Nautilus.Tests
         [Test]
         public void Acid()
         {
-            var rule = _fw.Create();
+            var rule = _fw.CreateRule();
             rule.Enabled = true;
             rule.Protocol = ProtocolTypes.TCP;
             rule.Profiles = Profiles.Domain | Profiles.Private;
             rule.RemoteAddresses.Add(IPAddress.Parse("8.8.8.8"));
 
-            _fw.Update(rule);
+            _fw.UpdateRule(rule);
 
 
-            rule = _fw.Get(rule.Id);
+            rule = _fw.RetrieveRule(rule.Id);
             Assert.NotNull(rule);
 
 
-            _fw.Delete(rule.Id);
+            _fw.DeleteRule(rule.Id);
 
             CollectionAssert.DoesNotContain(_fw.Rules, rule);
 
-            _fw.Clear();
+            _fw.DropRules();
             CollectionAssert.IsEmpty(_fw.Rules);
         }
     }

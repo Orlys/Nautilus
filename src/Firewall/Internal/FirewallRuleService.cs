@@ -9,8 +9,10 @@ namespace Nautilus
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
 
-    public class FirewallServiceImpl : IFirewallService
+    public class FirewallRuleService : IFirewallRuleService
     {
         private readonly INetFwPolicy2 _netFwPolicy2;
         private readonly string _groupName;
@@ -21,7 +23,7 @@ namespace Nautilus
             public IFirewallRule FirewallRule { get; set; }
             public INetFwRule NetFwRule { get; set; }
         }
-        public FirewallServiceImpl(string groupName)
+        public FirewallRuleService(string groupName)
         {
             this._netFwPolicy2 = NetFwUtils.CreateNetFwPolicy2();
             this._groupName = groupName;
@@ -29,14 +31,7 @@ namespace Nautilus
             this.Init();
         }
 
-        public IEnumerable<IFirewallRule> Rules
-        {
-            get
-            {
-                foreach (var v in _rules.Values)
-                    yield return v.FirewallRule;
-            }
-        }
+        public IReadOnlyCollection<IFirewallRule> Rules => new ReadOnlyCollection<IFirewallRule>(_rules.Values.Select(x => x.FirewallRule).ToArray());
 
 
         //public bool this[Profiles profiles]
@@ -82,7 +77,7 @@ namespace Nautilus
         }
 
 
-        public IFirewallRule Get(Guid id)
+        public IFirewallRule RetrieveRule(Guid id)
         {
             if (_rules.TryGetValue(id, out var ruleBag))
             {
@@ -96,12 +91,12 @@ namespace Nautilus
             return new FirewallRule(id, this._groupName, string.Empty, string.Empty, string.Empty, string.Empty);
         }
 
-        public IFirewallRule Create()
+        public IFirewallRule CreateRule()
         {
             return CreateCore(Guid.NewGuid());
         }
 
-        public void Update(IFirewallRule rule)
+        public void UpdateRule(IFirewallRule rule)
         {
             if (!_rules.TryGetValue(rule.Id, out var bag))
             {
@@ -146,7 +141,7 @@ namespace Nautilus
             return id.ToString("N");
         }
 
-        public bool Delete(Guid id)
+        public bool DeleteRule(Guid id)
         {
             var flag = _rules.TryRemove(id, out _);
 
@@ -155,11 +150,11 @@ namespace Nautilus
         }
 
 
-        public void Clear()
+        public void DropRules()
         {
             foreach (var id in _rules.Keys)
             {
-                this.Delete(id);
+                this.DeleteRule(id);
             }
         }
     }

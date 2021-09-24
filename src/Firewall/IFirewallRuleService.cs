@@ -7,42 +7,42 @@ namespace Nautilus
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public interface IFirewallService
+    public interface IFirewallRuleService
     {
         /// <summary>
         /// Gets all of the firewall rules.
         /// </summary>
-        IEnumerable<IFirewallRule> Rules { get; }
+        IReadOnlyCollection<IFirewallRule> Rules { get; }
 
         /// <summary>
         /// Removes all of the firewall rules.
         /// </summary>
         /// <returns></returns>
-        void Clear();
+        void DropRules();
 
         /// <summary>
         /// Updates the firewall rule.
         /// </summary>
         /// <param name="rule"></param>
-        void Update(IFirewallRule rule);
+        void UpdateRule(IFirewallRule rule);
 
         /// <summary>
         /// Creates a new firewall rule.
         /// </summary>
         /// <returns></returns>
-        IFirewallRule Create();
+        IFirewallRule CreateRule();
         
         /// <summary>
         /// Gets a firewall rule by <see cref="IFirewallRule.Id"/>.
         /// </summary>
         /// <returns></returns>
-        IFirewallRule Get(Guid id);
+        IFirewallRule RetrieveRule(Guid id);
 
         /// <summary>
         /// Deletes the firewall rule by <see cref="IFirewallRule.Id"/>.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        bool Delete(Guid id);
+        bool DeleteRule(Guid id);
     }
 }

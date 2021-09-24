@@ -38,12 +38,12 @@ namespace Nautilus
         /// <summary>
         /// Gets the firewall service from advance firewall rule list.
         /// </summary> 
-        public static IFirewallService GetService(string name)
+        public static IFirewallRuleService GetRuleService(string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentNullException(nameof(name));
 
-            return new FirewallServiceImpl(name);
+            return new FirewallRuleService(name);
         }
     }
 }

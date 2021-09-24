@@ -11,7 +11,7 @@ namespace Nautilus
     using System.Net;
     using System.Runtime.CompilerServices;
 
-    public class FirewallRule : IFirewallRule
+    internal class FirewallRule : IFirewallRule
     {
         internal FirewallRule(Guid id, string groupName,
             string localAddrs,
