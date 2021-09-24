@@ -1,17 +1,16 @@
 ﻿// Author: Orlys
 // Github: https://github.com/Orlys
 
-namespace Nautilus.Windows.Firewall
+namespace System.Net
 {
+    using Nautilus;
+
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Runtime.Serialization;
 
-    /// <summary>
-    /// Port range. This class supported implicit cast from <see cref="Range"/>, <see
-    /// langword="string"/> and <see langword="ushort"/> types.
-    /// </summary>
-    [Summary("Port range. This class supported implicit cast from 'Range', 'string' and 'ushort' types.")]
+    [Serializable]
     public class PortRange : IFixedRange<ushort>, IEquatable<PortRange>
     {
         private readonly bool _isSinglePort;
@@ -19,7 +18,33 @@ namespace Nautilus.Windows.Firewall
         public ushort Begin { get; }
         public ushort End { get; }
 
-        [EditorBrowsable(EditorBrowsableState.Advanced)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        protected PortRange(SerializationInfo info, StreamingContext context)
+        {
+            var names = new List<string>();
+            foreach (var item in info) names.Add(item.Name);
+
+            Func<string, ushort> deserialize = (name) => names.Contains(name) ?
+                 ushort.Parse(info.GetValue(name, typeof(object)).ToString()) :
+                 (ushort)0;
+
+            this.Begin = deserialize(nameof(Begin));
+            this.End = deserialize(nameof(End));
+            this._specificLocalPort = info.GetValue(nameof(SpecificLocalPort), typeof(string)) is string lp
+                ? (SpecificLocalPort)Enum.Parse(typeof(SpecificLocalPort), lp)
+                : default(SpecificLocalPort?);
+        }
+
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            if (info == null) throw new ArgumentNullException(nameof(info));
+
+            info.AddValue(nameof(Begin), this.Begin.ToString());
+            info.AddValue(nameof(End), this.End.ToString());
+            info.AddValue(nameof(SpecificLocalPort), this._specificLocalPort?.ToString());
+        }
+
+
         public PortRange(SpecificLocalPort specificLocalPort)
         {
             this._specificLocalPort = specificLocalPort;
@@ -45,22 +70,9 @@ namespace Nautilus.Windows.Firewall
         {
         }
 
-        public static explicit operator PortRange(string str)
+        public static implicit operator PortRange(SpecificLocalPort specificLocalPort)
         {
-            if (TryParse(str, out var v))
-                return v;
-            throw new FormatException();
-        }
-
-        public static implicit operator PortRange(Range range)
-        {
-            if (range.Start.Value < 0 || range.Start.Value > 65535)
-                throw new ArgumentOutOfRangeException(nameof(range.Start));
-
-            if (range.End.Value < 0 || range.End.Value > 65535)
-                throw new ArgumentOutOfRangeException(nameof(range.End));
-
-            return new PortRange((ushort)range.Start.Value, (ushort)range.End.Value);
+            return new PortRange(specificLocalPort);
         }
 
         public static implicit operator PortRange(ushort port)
