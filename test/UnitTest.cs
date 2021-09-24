@@ -15,18 +15,18 @@ namespace Nautilus.Tests
         }
 
 
-        //[Test]
-        //public void Set()
-        //{
-        //    var rule = _fw.Create();
-        //    rule.Enabled = true;
-        //    _fw.Update(rule);
-
-        //    _fw[Profiles.Domain] = false;
-        //}
+        [Test]
+        public void Traffic()
+        {
+            var traffics = TcpTrafficTracker.Track(IPAddressFamily.v6);
+            foreach (var traffic in traffics)
+            {
+                System.Console.WriteLine(traffic.LocalEndPoint + "  " + traffic.RemoteEndPoint + "  " + traffic.State + "  " + traffic.Pid + "  " + traffic.GetHashCode());
+            }
+        }
 
         [Test]
-        public void Acid()
+        public void FirewallRule_Acid()
         {
             var rule = _fw.CreateRule();
             rule.Enabled = true;
