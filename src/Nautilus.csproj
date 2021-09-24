@@ -1,42 +1,43 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
-    <ApplicationIcon />
-    <StartupObject />
-    <Version>1.0.1</Version>
-    <Description>Fully-asynchronous programmable dynamic firewall API for Windows platform written in C#.</Description>
-    <Authors>Orlys</Authors>
-    <Company>Orlys</Company>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/Orlys/Nautilus</PackageProjectUrl>
-    <PackageTags>NetFwTypeLib;Windows Firewall;Firewall</PackageTags>
-    <RepositoryUrl>https://github.com/Orlys/Nautilus</RepositoryUrl>
-    <Copyright>Copyright © 2020 Orlys Ma</Copyright>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageId>Orlys.Nautilus</PackageId>
-    <Product>Orlys.Nautilus</Product>
-  </PropertyGroup>
+	<PropertyGroup>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<TargetFramework>net48</TargetFramework>
+		<ApplicationIcon />
+		<StartupObject />
+		<Version>1.0.1</Version>
+		<Description>Fully-asynchronous programmable dynamic firewall API for Windows platform written in C#.</Description>
+		<Authors>Orlys</Authors>
+		<Company>Orlys</Company>
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+		<PackageProjectUrl>https://github.com/Orlys/Nautilus</PackageProjectUrl>
+		<PackageTags>NetFwTypeLib;Windows Firewall;Firewall</PackageTags>
+		<RepositoryUrl>https://github.com/Orlys/Nautilus</RepositoryUrl>
+		<Copyright>Copyright © 2020 Orlys Ma</Copyright>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageId>Orlys.Nautilus</PackageId>
+		<Product>Orlys.Nautilus</Product> 
+	</PropertyGroup>
 
-  <ItemGroup>
-    <COMReference Include="NetFwTypeLib.dll">
-      <Guid>58fbcf7c-e7a9-467c-80b3-fc65e8fcca08</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-    </COMReference>
-  </ItemGroup>
+	<ItemGroup>
+		<COMReference Include="NetFwTypeLib.dll">
+			<Guid>58fbcf7c-e7a9-467c-80b3-fc65e8fcca08</Guid>
+			<VersionMajor>1</VersionMajor>
+			<VersionMinor>0</VersionMinor>
+			<WrapperTool>tlbimp</WrapperTool>
+			<Lcid>0</Lcid>
+			<Isolated>false</Isolated>
+		</COMReference>
+	</ItemGroup>
 
 
-  <ItemGroup>
-    <None Include="..\LICENSE.txt">
-      <Pack>True</Pack>
-		<Visible>False</Visible>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\LICENSE.txt">
+			<Pack>True</Pack>
+			<Visible>False</Visible>
+			<PackagePath></PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>

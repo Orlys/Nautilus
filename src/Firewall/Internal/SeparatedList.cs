@@ -7,176 +7,105 @@ namespace Nautilus
     using System.Collections;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq.Expressions;
+    using System.Net;
     using System.Reflection;
 
+    internal class PortRangeList : CommaSeparatedList<PortRange, ushort, PortRangeList> { }
 
-
-    internal class SeparatedList<T> : IList<T>
+    internal class IPAddressRangeList : CommaSeparatedList<IPAddressRange, IPAddress, IPAddressRangeList>
     {
-        private delegate bool TryParseDelegate(string s, out T result);
-
-        private static TryParseDelegate s_deleCache;
-
-
-        private readonly List<T> _list;
-        private readonly object _lock = new object();
-        private readonly string _separator;
-
-        public event EventHandler ListChanged;
-
-        public int Count
+        protected override IPAddressRange ParseSingleRange(string segment)
         {
-            get
+            if (segment == "*")
             {
-                lock (this._lock)
-                    return _list.Count;
+                return new IPAddressRange(IPAddress.IPv6Any, 0);
             }
+
+
+            return base.ParseSingleRange(segment);
+        }
+    }
+
+    internal class CommaSeparatedList<TFixedRange, TUnit, T> : ICollection<TFixedRange> where TFixedRange : IFixedRange<TUnit>
+        where T : CommaSeparatedList<TFixedRange, TUnit, T>, new()
+    {
+        private readonly ConcurrentDictionary<TFixedRange, object> _list;
+        private static readonly string[] s_comma = { "," };
+         
+
+        protected virtual TFixedRange ParseSingleRange(string segment)
+        {
+            var parsed = GenericParser<TFixedRange>.Parse(segment);
+            return parsed;
         }
 
-        public bool IsReadOnly => false;
-
-        public virtual T this[int index]
+        public static T CreateFrom(string str)
         {
-            get
+            var list = new T();
+            if (string.IsNullOrWhiteSpace(str))
+                return list;
+
+            var segs = str.Split(s_comma, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var seg in segs)
             {
-                lock (this._lock)
-                {
-                    return _list[index];
-                }
+                var parsed = list.ParseSingleRange(seg);
+                list.Add(parsed);
             }
-            set
-            {
-                lock (this._lock)
-                {
-                    _list[index] = value;
-                    this.ListChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
 
-        public SeparatedList(string value, string separator)
-        {
-            this._separator = separator;
-            this._list = new List<T>();
-
-            if (string.IsNullOrWhiteSpace(value))
-                return;
-
-            var parser = GetParser();
-            var vSegs = value.Split(separator.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
-            foreach (var vSeg in vSegs)
-            {
-                if (parser(vSeg, out var v))
-                    this._list.Add(v);
-            }
-        }
-
-        public virtual void Add(T value)
-        {
-            lock (this._lock)
-            {
-                this._list.Add(value);
-                this.ListChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        public virtual void Clear()
-        {
-            lock (this._lock)
-            {
-                _list.Clear();
-                this.ListChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        public bool Contains(T item)
-        {
-            lock (this._lock)
-                return _list.Contains(item);
-        }
-
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            lock (this._lock)
-                _list.CopyTo(array, arrayIndex);
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            lock (this._lock)
-                return ((IEnumerable<T>)_list).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            lock (this._lock)
-                return ((IEnumerable<T>)_list).GetEnumerator();
-        }
-
-        public int IndexOf(T item)
-        {
-            lock (this._lock)
-                return _list.IndexOf(item);
-        }
-
-        public virtual void Insert(int index, T item)
-        {
-            lock (this._lock)
-            {
-                _list.Insert(index, item);
-                this.ListChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        public string Reduce()
-        {
-            lock (this._lock)
-                return string.Join(this._separator, this);
-        }
-
-        public virtual bool Remove(T value)
-        {
-            lock (this._lock)
-            {
-                var v = this._list.Remove(value);
-                if (v)
-                    this.ListChanged?.Invoke(this, EventArgs.Empty);
-                return v;
-            }
-        }
-
-        public virtual void RemoveAt(int index)
-        {
-            lock (this._lock)
-            {
-                _list.RemoveAt(index);
-                this.ListChanged?.Invoke(this, EventArgs.Empty);
-            }
+            return list;
         }
 
         public override string ToString()
         {
-            return this.Reduce();
+            return string.Join(s_comma[default], this);
         }
 
-        private static TryParseDelegate GetParser()
+
+        protected CommaSeparatedList()
         {
-            if (s_deleCache != null)
-                return s_deleCache;
+            this._list = new ConcurrentDictionary<TFixedRange, object>();
+        }
 
-            var type = typeof(T);
-            var s = Expression.Parameter(typeof(string));
-            var refType = type.MakeByRefType();
-            var result = Expression.Parameter(refType);
-            var tryParseMethod = type.GetMethod("TryParse", BindingFlags.Public | BindingFlags.Static, null, new[] { s.Type, refType }, null);
+        public void Add(TFixedRange range)
+        {
+            this._list.TryAdd(range, null);
+        }
 
-            if (tryParseMethod == null)
-                throw new MissingMethodException(type.FullName, "TryParse");
+        public bool Remove(TFixedRange range)
+        {
+            var flag = this._list.TryRemove(range, out _); 
+            return flag;
+        }
 
-            var caller = Expression.Call(tryParseMethod, s, result) as Expression;
-            s_deleCache = Expression.Lambda<TryParseDelegate>(caller, s, result).Compile();
-            return s_deleCache;
+        public void Clear()
+        {
+            this._list.Clear(); 
+        }
+
+        public bool Contains(TFixedRange item)
+        {
+            return this._list.ContainsKey(item);
+        }
+
+        public void CopyTo(TFixedRange[] array, int arrayIndex)
+        {
+            this._list.Keys.CopyTo(array, arrayIndex);
+        }
+
+        public int Count => this._list.Count;
+        public bool IsReadOnly { get; }
+
+        public IEnumerator<TFixedRange> GetEnumerator()
+        {
+            return this._list.Keys.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
         }
     }
 }

@@ -6,13 +6,18 @@ namespace Nautilus
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Net;
 
-    public interface IFirewallRule : IEquatable<IFirewallRule>
-    {
+    public interface IFirewallRule
+    { 
+        /// <summary>
+        /// Determines when protocol 
+        /// </summary>
+        bool SupportedPortRange { get; }
+
         /// <summary>
         /// Gets or sets the action of the firewall rule.
-        /// </summary>
-        [DefaultValue(Actions.Block)]
+        /// </summary> 
         Actions Action { get; set; }
 
         /// <summary>
@@ -27,8 +32,7 @@ namespace Nautilus
 
         /// <summary>
         /// Gets or sets the direction of the firewall rule.
-        /// </summary>
-        [DefaultValue(Directions.Incoming)]
+        /// </summary> 
         Directions Direction { get; set; }
 
         /// <summary>
@@ -49,43 +53,40 @@ namespace Nautilus
 
         /// <summary>
         /// Gets or sets the interface types of the firewall rule.
-        /// </summary>
-        [DefaultValue(InterfaceTypes.All)]
+        /// </summary> 
         InterfaceTypes InterfaceTypes { get; set; }
 
         /// <summary>
         /// Gets the local address list of the firewall rule.
         /// </summary>
-        IList<IPAddressRange> LocalAddresses { get; }
+        ICollection<IPAddressRange> LocalAddresses { get; }
 
         /// <summary>
         /// Gets the local port list of the firewall rule when the protocol is <see
         /// cref="SlimProtocolTypes.UDP"/> or <see cref="SlimProtocolTypes.TCP"/>, otherwise empty list.
         /// </summary>
-        IList<PortRange> LocalPorts { get; }
+        ICollection<PortRange> LocalPorts { get; }
 
         /// <summary>
         /// Gets or sets the profiles of the firewall rule.
         /// </summary>
-        [DefaultValue(Profiles.All)]
         Profiles Profiles { get; set; }
 
         /// <summary>
         /// Gets or sets the network protocol of the firewall rule.
         /// </summary>
-        [DefaultValue(SlimProtocolTypes.Any)]
         ProtocolTypes Protocol { get; set; }
 
         /// <summary>
         /// Gets the remote address list of the firewall rule.
         /// </summary>
-        IList<IPAddressRange> RemoteAddresses { get; }
+        ICollection<IPAddressRange> RemoteAddresses { get; }
 
         /// <summary>
         /// Gets the remote port list of the firewall rule when the protocol is <see
         /// cref="SlimProtocolTypes.UDP"/> or <see cref="SlimProtocolTypes.TCP"/>, otherwise empty list.
         /// </summary>
-        IList<PortRange> RemotePorts { get; }
+        ICollection<PortRange> RemotePorts { get; }
 
         /// <summary>
         /// Gets or sets the service name of the firewall rule.

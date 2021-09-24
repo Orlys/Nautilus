@@ -9,69 +9,157 @@ namespace Nautilus
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Reflection;
-    using System.Threading.Tasks;
-     
 
-    internal class FirewallServiceImpl : IFirewallService
+    public class FirewallServiceImpl : IFirewallService
     {
         private readonly INetFwPolicy2 _netFwPolicy2;
-        private readonly string _serviceName;
-        private readonly ConcurrentDictionary<Guid, IFirewallRule> _rules;
-        public IEnumerable<IFirewallRule> Rules => this._rules.Values;
+        private readonly string _groupName;
+        private readonly ConcurrentDictionary<Guid, RuleBag> _rules;
 
-        public FirewallServiceImpl(string name)
+        private class RuleBag
         {
-            this._serviceName = name;
+            public IFirewallRule FirewallRule { get; set; }
+            public INetFwRule NetFwRule { get; set; }
+        }
+        public FirewallServiceImpl(string groupName)
+        {
             this._netFwPolicy2 = NetFwUtils.CreateNetFwPolicy2();
-            this._rules = new ConcurrentDictionary<Guid, IFirewallRule>();
-
-            Initialize();
+            this._groupName = groupName;
+            this._rules = new ConcurrentDictionary<Guid, RuleBag>();
+            this.Init();
         }
 
-        private void Initialize()
+        public IEnumerable<IFirewallRule> Rules
         {
-            foreach (INetFwRule rule in this._netFwPolicy2.Rules)
+            get
             {
-                if (!string.Equals(this._serviceName, rule.Grouping))
-                    continue;
-
-                var fwRule = NetFwUtils.Convert(rule);
-                this._rules[fwRule.Id] = fwRule;
+                foreach (var v in _rules.Values)
+                    yield return v.FirewallRule;
             }
         }
 
-        public void Clear()
+
+        //public bool this[Profiles profiles]
+        //{
+        //    get
+        //    {
+        //        return this._netFwPolicy2.IsRuleGroupEnabled((int)profiles, _groupName);
+        //    }
+        //    set
+        //    {
+        //        this._netFwPolicy2.EnableRuleGroup((int)profiles, _groupName, value);
+        //    }
+        //}
+
+        private void Init()
         {
-            lock (this._netFwPolicy2)
+            foreach (INetFwRule netFwRule in _netFwPolicy2.Rules)
             {
-                var keys = this._rules.Keys;
-                foreach (var key in keys)
+                if (!string.Equals(netFwRule.Grouping, this._groupName))
                 {
-                    this.Delete(key);
+                    continue;
                 }
+
+                if (!Guid.TryParse(netFwRule.Name, out var id))
+                {
+                    continue;
+                }
+
+                var r = CreateCore(id);
+                r.Action = (Actions)netFwRule.Action;
+                r.ApplicationName = netFwRule.ApplicationName;
+                r.Description = netFwRule.Description;
+                r.Direction = (Directions)netFwRule.Direction;
+                r.Enabled = netFwRule.Enabled;
+                r.IcmpTypesAndCodes = netFwRule.IcmpTypesAndCodes;
+                r.InterfaceTypes = (InterfaceTypes)Enum.Parse(typeof(InterfaceTypes), netFwRule.InterfaceTypes);
+                r.Profiles = (Profiles)netFwRule.Profiles;
+                r.Protocol = netFwRule.Protocol;
+                r.ServiceName = netFwRule.serviceName;
+
+                _rules[id] = new RuleBag { FirewallRule = r, NetFwRule = netFwRule };
             }
+        }
+
+
+        public IFirewallRule Get(Guid id)
+        {
+            if (_rules.TryGetValue(id, out var ruleBag))
+            {
+                return ruleBag.FirewallRule;
+            }
+            return null;
+        }
+
+        private IFirewallRule CreateCore(Guid id)
+        {
+            return new FirewallRule(id, this._groupName, string.Empty, string.Empty, string.Empty, string.Empty);
         }
 
         public IFirewallRule Create()
         {
-            lock (this._netFwPolicy2)
+            return CreateCore(Guid.NewGuid());
+        }
+
+        public void Update(IFirewallRule rule)
+        {
+            if (!_rules.TryGetValue(rule.Id, out var bag))
             {
-                var fwRule = NetFwUtils.Create(this._serviceName, out var netFwRule);
-                this._netFwPolicy2.Rules.Add(netFwRule);
-                this._rules[fwRule.Id] = fwRule;
-                return fwRule;
+                // new rule, not existed in windows firewall
+
+                var netFwRule = NetFwUtils.CreateNetFwRule();
+
+                netFwRule.Name = GetIdString(rule.Id);
+                netFwRule.Grouping = this._groupName;
+                bag = new RuleBag
+                {
+                    FirewallRule = rule,
+                    NetFwRule = netFwRule
+                };
+                _rules.TryAdd(rule.Id, bag);
+                _netFwPolicy2.Rules.Add(netFwRule);
+            }
+
+            bag.NetFwRule.Action = (NET_FW_ACTION_)rule.Action;
+            bag.NetFwRule.ApplicationName = rule.ApplicationName;
+            bag.NetFwRule.Description = rule.Description;
+            bag.NetFwRule.Direction = (NET_FW_RULE_DIRECTION_)rule.Direction;
+            bag.NetFwRule.Enabled = rule.Enabled;
+            if (rule.Protocol.SupportedIcmpConfig)
+                bag.NetFwRule.IcmpTypesAndCodes = rule.IcmpTypesAndCodes;
+            bag.NetFwRule.InterfaceTypes = rule.InterfaceTypes.ToString();
+            bag.NetFwRule.Profiles = (int)rule.Profiles;
+            bag.NetFwRule.Protocol = rule.Protocol;
+            bag.NetFwRule.serviceName = rule.ServiceName;
+
+            bag.NetFwRule.LocalAddresses = rule.LocalAddresses.ToString();
+            bag.NetFwRule.RemoteAddresses = rule.RemoteAddresses.ToString();
+            if (rule.SupportedPortRange)
+            {
+                bag.NetFwRule.LocalPorts = rule.LocalPorts.ToString();
+                bag.NetFwRule.RemotePorts = rule.RemotePorts.ToString();
             }
         }
 
-        public void Delete(Guid id)
+        private string GetIdString(Guid id)
         {
-            lock (this._netFwPolicy2)
+            return id.ToString("N");
+        }
+
+        public bool Delete(Guid id)
+        {
+            var flag = _rules.TryRemove(id, out _);
+
+            _netFwPolicy2.Rules.Remove(GetIdString(id));
+            return flag;
+        }
+
+
+        public void Clear()
+        {
+            foreach (var id in _rules.Keys)
             {
-                var result = this._rules.TryRemove(id, out var _);
-                if (result)
-                    this._netFwPolicy2.Rules.Remove(id.ToString()); 
+                this.Delete(id);
             }
         }
     }

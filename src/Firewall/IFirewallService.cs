@@ -21,16 +21,28 @@ namespace Nautilus
         void Clear();
 
         /// <summary>
+        /// Updates the firewall rule.
+        /// </summary>
+        /// <param name="rule"></param>
+        void Update(IFirewallRule rule);
+
+        /// <summary>
         /// Creates a new firewall rule.
         /// </summary>
         /// <returns></returns>
         IFirewallRule Create();
+        
+        /// <summary>
+        /// Gets a firewall rule by <see cref="IFirewallRule.Id"/>.
+        /// </summary>
+        /// <returns></returns>
+        IFirewallRule Get(Guid id);
 
         /// <summary>
         /// Deletes the firewall rule by <see cref="IFirewallRule.Id"/>.
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        void Delete(Guid id);
+        bool Delete(Guid id);
     }
 }

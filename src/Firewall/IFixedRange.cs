@@ -3,11 +3,11 @@
 
 namespace Nautilus
 {
-    public interface IFixedRange<T>
+    public interface IFixedRange<TUnit>
     {
-        T Begin { get; }
-        T End { get; }
+        TUnit Begin { get; }
+        TUnit End { get; }
 
-        bool Contains(T value);
+        bool Contains(TUnit value);
     }
 }
