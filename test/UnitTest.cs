@@ -13,22 +13,7 @@ namespace Nautilus.Tests
         {
             this._fw = Firewall.GetRuleService("@__Test");
         }
-
-
-<<<<<<< HEAD
-        //[Test]
-        //public void Set()
-        //{
-        //    var rule = _fw.Create();
-        //    rule.Enabled = true;
-        //    _fw.Update(rule);
-
-        //    _fw[Profiles.Domain] = false;
-        //}
-
-        [Test]
-        public void Acid()
-=======
+         
         [Test]
         public void Traffic()
         {
@@ -40,8 +25,7 @@ namespace Nautilus.Tests
         }
 
         [Test]
-        public void FirewallRule_Acid()
->>>>>>> pickback
+        public void FirewallRule_Acid() 
         {
             var rule = _fw.CreateRule();
             rule.Enabled = true;
