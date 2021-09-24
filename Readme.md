@@ -1,5 +1,5 @@
-## Nautilus 
-![](https://img.shields.io/badge/Orlys.Nautilus-v2.0.0-blue?logo=nuget&style=flat&link=https://www.nuget.org/packages/Orlys.Nautilus/)  
+## Nautilus [![](https://img.shields.io/nuget/v/Orlys.Nautilus?logo=nuget)](https://www.nuget.org/packages/Orlys.Nautilus/)  
+
 Dynamic firewall API for Windows platform written in C#.
 
 ## Usage
