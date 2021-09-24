@@ -15,6 +15,7 @@ namespace Nautilus.Tests
         }
 
 
+<<<<<<< HEAD
         //[Test]
         //public void Set()
         //{
@@ -27,6 +28,20 @@ namespace Nautilus.Tests
 
         [Test]
         public void Acid()
+=======
+        [Test]
+        public void Traffic()
+        {
+            var traffics = TcpTrafficTracker.Track(IPAddressFamily.v6);
+            foreach (var traffic in traffics)
+            {
+                System.Console.WriteLine(traffic.LocalEndPoint + "  " + traffic.RemoteEndPoint + "  " + traffic.State + "  " + traffic.Pid + "  " + traffic.GetHashCode());
+            }
+        }
+
+        [Test]
+        public void FirewallRule_Acid()
+>>>>>>> pickback
         {
             var rule = _fw.CreateRule();
             rule.Enabled = true;

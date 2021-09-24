@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Nautilus
 Dynamic firewall API for Windows platform written in C#.
 
@@ -5,6 +6,18 @@ Dynamic firewall API for Windows platform written in C#.
 ```csharp
 // required COM+ component 'NetFwTypeLib' and admin permission.
 using Nautilus; 
+=======
+## Nautilus 
+![](https://img.shields.io/badge/Orlys.Nautilus-v2.0.0-blue?logo=nuget&style=flat&link=https://www.nuget.org/packages/Orlys.Nautilus/)  
+Dynamic firewall API for Windows platform written in C#.
+
+## Usage
+### Firewall
+```csharp
+// required COM+ component 'NetFwTypeLib' and admin permission.
+using Nautilus; 
+using System.Net;
+>>>>>>> pickback
 
 // Gets the firewall service from advance firewall rule list.
 var service = Firewall.GetService("service name in fw panel"); // type: IFirewallService
@@ -34,6 +47,17 @@ service.DeleteRule(rule.Id);
 
 // removes all firewall rules.
 service.DropRules();
+<<<<<<< HEAD
+=======
+```
+
+### Traffics
+```csharp
+using Nautilus; 
+
+var families = IPAddressFamily.v4 | IPAddressFamily.v6;
+var trafficRows = TcpTrafficTracker.Track(families); // type: IReadOnlyCollection<TcpTrafficRow>
+>>>>>>> pickback
 ```
 
 ## License
