@@ -2,8 +2,8 @@
 
 	<PropertyGroup>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<TargetFramework>net48</TargetFramework>
-		<Version>2.0.1</Version>
+		<TargetFramework>net472</TargetFramework>
+		<Version>2.0.2</Version>
 		<Description>Dynamic firewall API for Windows platform written in C#.</Description>
 		<Authors>Orlys</Authors>
 		<Company>Orlys</Company>

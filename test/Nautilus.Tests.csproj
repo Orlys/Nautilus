@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<TargetFramework>net48</TargetFramework> 
+		<TargetFramework>net472</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
