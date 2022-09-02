@@ -18,7 +18,7 @@
 		<Product>Orlys.Nautilus</Product> 
 	</PropertyGroup>
 
-	<ItemGroup>
+	<!--<ItemGroup>
 		<COMReference Include="NetFwTypeLib.dll">
 			<Guid>58fbcf7c-e7a9-467c-80b3-fc65e8fcca08</Guid>
 			<VersionMajor>1</VersionMajor>
@@ -27,7 +27,7 @@
 			<Lcid>0</Lcid>
 			<Isolated>false</Isolated>
 		</COMReference>
-	</ItemGroup>
+	</ItemGroup>-->
 
 
 	<ItemGroup>
@@ -36,6 +36,11 @@
 			<Visible>False</Visible>
 			<PackagePath></PackagePath>
 		</None>
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Folder Include="Properties\" />
 	</ItemGroup>
 
 </Project>
