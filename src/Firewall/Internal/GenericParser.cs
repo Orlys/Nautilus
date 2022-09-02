@@ -11,7 +11,7 @@ namespace Nautilus
     internal static class GenericParser<T>
     {
         private delegate bool TryParseDelegate(string s, out T result);  
-        private static Lazy<TryParseDelegate> s_tryParse = new Lazy<TryParseDelegate>(GetTryParseMethod); 
+        private readonly static Lazy<TryParseDelegate> s_tryParse = new Lazy<TryParseDelegate>(GetTryParseMethod); 
         public static bool TryParse(string str, out T value) => s_tryParse.Value(str, out value); 
         private static TryParseDelegate GetTryParseMethod()
         {  
@@ -30,7 +30,7 @@ namespace Nautilus
 
 
         private delegate T ParseDelegate(string s);
-        private static Lazy<ParseDelegate> s_parse = new Lazy<ParseDelegate>(Parse);
+        private readonly static Lazy<ParseDelegate> s_parse = new Lazy<ParseDelegate>(Parse);
         public static T Parse(string str) => s_parse.Value(str);
         private static ParseDelegate Parse()
         {
